@@ -1,0 +1,10 @@
+const fs = require('fs');
+const input = process.argv[2];
+const output = process.argv[3];
+let s = fs.readFileSync(input, 'utf8');
+const match = s.match(/return\(0,eval\)\(([_$A-Za-z0-9]+)\);/);
+if (!match) throw new Error('eval marker not found');
+s = s.replace(match[0], `fs.writeFileSync(process.argv[3], ${match[1]}); return;`);
+fs.writeFileSync(output, '');
+global.setInterval = () => 0;
+eval(s);

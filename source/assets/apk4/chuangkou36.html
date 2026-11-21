@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>钢筋配置计算</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link href="css/mui.min.css" rel="stylesheet"/>
+<link href="css/icons-extra.css" rel="stylesheet"/>
+<link rel="icon" href="favicon.png" type="images/x-ico" />
+<style>
+:root{
+  --bg:#eef1f5; --panel:#ffffff; --line:#d7dce3; --line2:#c3cad4;
+  --txt:#1f2733; --muted:#5b6775;
+  --accent:#007AFF; --accent-deep:#16324F; --accent-soft:#80BDFF; --accent-line:#A9C6E8;
+  --head-bg:#eef1f5; --calc-bg:#FBFCFD;
+  --ok:#0e7a3c; --warn:#b54708; --err:#c0392b;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg); color:var(--txt);   /* 字体/字号/行距均由 MUI 原生控制（页面1 同款），页面自身不强制覆盖 */
+}
+/* ===== 内容区（顶部标题栏 44px + 底部导航栏 50px 之间） ===== */
+#app{height:100%; padding:44px 0 50px; display:flex; flex-direction:column; overflow:hidden;}
+/* ===== 工具栏（一行：左=裁料计算/表格行数/双面焊，右=下载/重置/说明） ===== */
+.toolbar{flex:0 0 auto; background:var(--panel); border-bottom:1px solid var(--line); padding:8px 10px; display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px;}
+.toolbar-line{display:flex; align-items:center; flex-wrap:nowrap; gap:8px; flex:1 1 auto;}   /* 占满工具栏宽度，桌面/移动端均保持一行显示，内部右组才有空间靠右 */
+.grp-left{display:inline-flex; align-items:center; gap:8px;}   /* 裁料计算/表格行数/双面焊 靠左 */
+.grp-right{display:inline-flex; align-items:center; gap:6px; margin-left:auto;}   /* 下载/重置/说明 靠右 */
+.mode-btn{border:1px solid var(--line2); background:var(--panel); height:28px; padding:0 18px; font-size:14px; cursor:pointer; color:var(--txt); border-radius:6px; transition:none;}   /* 禁 MUI 按钮 transition，实心/空心立即切换 */
+.mode-btn.active{background:var(--accent); color:#fff; font-weight:600; border-color:var(--accent);}
+.tool-btn{border:1px solid var(--line2); background:var(--panel); border-radius:6px; height:28px; padding:0 14px; font-size:14px; cursor:pointer; color:var(--txt); transition:none;}
+.tool-btn:hover{border-color:var(--accent); color:var(--accent);}
+.tool-btn:disabled{opacity:.45; cursor:not-allowed;}
+.tool-btn:disabled:hover{border-color:var(--line2); color:var(--txt);}
+.ctl-lbl{font-size:13px; color:var(--muted); display:inline-flex; align-items:center; gap:6px; height:28px; line-height:28px; margin:0; box-sizing:border-box;}
+#rowCount{width:96px; height:28px; line-height:28px; margin:0; padding:0 8px; border:1px solid #A9C6E8; border-radius:5px; font:inherit; font-size:13px; background:var(--panel);}
+#rowCount:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-soft);}
+.weld-btn{border:1px solid var(--line2); background:var(--panel); border-radius:5px; height:28px; padding:0 10px; font-size:13px; cursor:pointer; color:var(--txt); transition:none;}   /* 禁 MUI 按钮 transition，实心/空心立即切换 */
+#btnWeldToggle.active, #btnWeldToggle.active:hover, #btnWeldToggle.active:active{background:var(--accent) !important; color:#fff !important; border-color:var(--accent);}   /* 双面焊：实心（蓝底白字），防 MUI 全局按钮样式覆盖 */
+#btnWeldToggle.hollow, #btnWeldToggle.hollow:hover, #btnWeldToggle.hollow:active{background:var(--panel) !important; color:var(--accent) !important; border-color:var(--accent) !important;}   /* 单面焊：空心（白底蓝边蓝字），防 MUI 全局按钮样式覆盖 */
+.ctl-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+#fixedLenWrap{width:100%;}   /* 采购长度 5 档：整行换行至第二行 */
+.ctl-row label{font-size:13px; color:var(--muted); display:inline-flex; align-items:center; gap:6px; height:28px; line-height:28px; margin:0; box-sizing:border-box;}
+.ctl-row input[type=number], .ctl-row input[type=text]{
+  width:96px; height:28px; line-height:28px; margin:0; padding:0 8px; border:1px solid #A9C6E8; border-radius:5px; font:inherit; font-size:13px; background:var(--panel);
+}
+.ctl-row input:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-soft);}
+.ctl-row input.fixed-len-input{width:64px;}
+.ctl-row input.fixed-len-input.fixed-chosen{border-color:#19a974; box-shadow:0 0 0 2px rgba(25,169,116,.28); background:#eefaf3;}
+.weld-btn:hover{border-color:var(--accent); color:var(--accent);}
+.hidden{display:none !important;}
+/* ===== 中部 ===== */
+#tableWrap{flex:0 0 auto; min-height:0; overflow:auto; background:var(--panel); margin:2px 10px; position:relative;}
+table{width:100%; border-collapse:collapse; table-layout:fixed;}
+thead th{
+  position:sticky; top:0; z-index:3; background:var(--accent); border-bottom:2px solid #0066E6;
+  padding:2px 0.5px; font-size:12.5px; font-weight:600; text-align:center; line-height:1.35; color:#fff;
+}
+thead th .unit{display:block; font-weight:400; color:#fff; font-size:11px;}
+tbody td{border-bottom:1px solid var(--line); padding:0; vertical-align:middle; height:30px;}
+/* 表格输入框：覆盖 MUI 通用 input[type=text] 的 40px 高/10px 15px 内边距/15px 下边距（特异性与 MUI 平手、本页后加载生效），行高固定 28px */
+td input,
+td input[type='text']{
+  width:100%; height:28px; line-height:28px; margin:0; padding:0 3px;
+  border:0; outline:none; background:transparent; text-align:center; font:inherit;
+  font-size:13px; color:var(--txt);
+}
+td.in input{background:#fff; border:1px solid #A9C6E8; border-radius:4px;}
+td.in input:hover{border-color:#007AFF;}
+td.in input:focus{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-soft); background:#fff;}
+td.out{background:var(--calc-bg);}
+td.out input{background:transparent; font-weight:600; color:var(--accent-deep); cursor:default;}
+td.out input:focus{background:transparent;}
+td.out input:hover{border-color:transparent;}
+tbody tr.invalid-row td.in input{color:var(--err);}
+tbody tr:hover td.in{background:#fafbfd;}
+/* ===== 方案区 ===== */
+#plan{flex:0 0 auto; min-height:0; overflow:auto; background:var(--panel); border-top:1px solid var(--line); padding:8px 5px; margin:2px 10px 0;}
+#plan h3{font-size:14px; margin:10px 0 6px; color:var(--accent-deep); display:flex; align-items:center; gap:8px;}
+#plan h3:first-child{margin-top:0;}
+#plan h3 .idx{background:var(--accent); color:#fff; border-radius:4px; font-size:12px; padding:1px 7px; font-weight:600;}
+#plan h3 .dia-mark{font-size:17px; font-weight:700; color:var(--accent-deep);}
+.plan-block{background:#fafbfd; border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:10px;}
+.plan-empty{color:var(--muted); font-size:13px; text-align:center; padding:26px 10px; line-height:1.8;}
+.plan-block .meta{font-size:12.5px; color:var(--muted); margin-bottom:6px; line-height:1.7;}
+.plan-block .meta b{color:var(--txt);}
+.plan-table{width:100%; border-collapse:collapse; margin-top:6px; font-size:12.5px; table-layout:fixed;}
+.plan-table th{background:var(--head-bg); border:1px solid var(--line2); padding:5px 6px; font-weight:600; text-align:center; font-size:12px;}
+.plan-table td{border:1px solid var(--line); padding:5px 6px; text-align:center;}
+.plan-note{font-size:12px; color:var(--muted); margin-top:6px; line-height:1.6;}
+/* ===== 底部开始计算按钮（导航栏上方） ===== */
+.btnbar{flex:0 0 auto; background:var(--panel); border-top:1px solid var(--line); padding:6px 10px; display:flex; gap:10px;}
+#btnClear{height:40px; flex:1 1 0; padding:0; font-size:15px; font-weight:600; background:transparent; color:var(--accent);
+  border:1px solid var(--accent); border-radius:6px; cursor:pointer; letter-spacing:2px;}   /* 蓝色镂空，与开始计算等宽同高 */
+#btnClear:hover{background:var(--accent-soft);}
+#btnCalc{flex:1 1 0; height:40px; padding:0; font-size:15px; font-weight:600; background:var(--accent); color:#fff; border:0; border-radius:6px; cursor:pointer; letter-spacing:2px;}
+#btnCalc:hover{background:#0066E6;}
+#btnCalc:disabled{background:#80BDFF; cursor:not-allowed;}
+/* ===== 提示 ===== */
+#toastWrap{position:fixed; top:54px; left:50%; transform:translateX(-50%); z-index:99; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none;}
+.toast{background:#232a33; color:#fff; border-radius:6px; padding:9px 18px; font-size:13px; max-width:80vw; box-shadow:0 4px 14px rgba(0,0,0,.25);}
+.toast.ok{background:#0e7a3c;}
+.toast.err{background:#c0392b;}
+.toast.warn{background:#b54708;}
+/* ===== 模态框 ===== */
+.modal-mask{position:fixed; inset:0; background:rgba(20,28,40,.45); z-index:50; display:flex; align-items:center; justify-content:center; padding:20px;}
+.modal{background:var(--panel); border-radius:10px; max-width:760px; width:100%; max-height:86vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,.25);}
+.modal-help{width:65vw;max-width:65vw;}   /* 软件使用说明模态框：宽度与 37 页一致（桌面 65vw） */
+.modal-head{flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--line);}
+.modal-head h2{font-size:16px;}
+.modal-actions{display:flex; gap:10px; justify-content:flex-end;}   /* 与 36 页一致：底部操作区 */
+.modal-body + .modal-actions{margin-top:5px; padding:0 18px 16px;}   /* 关闭按钮与内容区留 5px 空隙，下边距收尾 */
+.btn{border:1px solid var(--accent); background:transparent; color:var(--accent); font:inherit; font-size:13px; font-weight:600; border-radius:5px; padding:3px 16px; cursor:pointer; transition:none;}   /* 与 36 页一致：镂空（蓝边框、蓝文字、透明底），禁 MUI 按钮过渡 */
+.btn:hover{background:var(--accent-soft);}   /* hover 淡蓝底反馈 */
+.btn.primary{border-color:var(--accent); color:var(--accent); background:transparent;}   /* primary 同样镂空 */
+.btn.primary:hover{background:var(--accent-soft);}
+/* ===== 重置确认模态框（与 37 页一致：确认后重置） ===== */
+.mask{position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:999; display:flex; align-items:center; justify-content:center;}
+.confirm-box{background:#fff; border-radius:10px; padding:10px 15px; min-width:300px; max-width:88vw; box-shadow:0 8px 30px rgba(0,0,0,.2);}
+.confirm-box .modal-title{font-size:15px; font-weight:600; margin-bottom:5px; color:var(--txt);}
+.confirm-box .modal-msg{font-size:14px; color:#555; margin-bottom:20px; line-height:1.7;}
+.modal-body{flex:1 1 auto; overflow:auto; padding:16px 18px 20px; font-size:13.5px; line-height:1.75; color:#2b3442;}
+.modal-body h3{font-size:14px; margin:16px 0 6px; color:var(--accent-deep);}
+.modal-body h3:first-child{margin-top:0;}
+.modal-body ul, .modal-body ol{margin:4px 0 6px 20px;}
+.modal-body li{margin:2px 0;}
+.modal-body code{background:var(--head-bg); border-radius:3px; padding:1px 5px; font-family:Consolas,monospace; font-size:12px;}
+/* ===== 移动端适配（工具栏保持一行显示，控件紧凑压缩） ===== */
+@media (max-width: 640px){
+  .toolbar-line{gap:4px;}   /* 一行显示，间距收紧 */
+  .grp-left{gap:4px;}
+  .grp-right{gap:3px;}
+  .mode-btn{padding:0 8px; font-size:13px;}
+  .weld-btn{padding:0 6px; font-size:13px;}
+  .tool-btn{padding:0 8px; font-size:13px;}
+  .ctl-lbl{font-size:12px; gap:3px;}
+  #rowCount{width:56px; font-size:13px;}
+  td input, .ctl-row input[type=number], .ctl-row input[type=text]{font-size:16px;}
+  .ctl-row input.fixed-len-input{font-size:13px; width:52px; padding:0 4px;}   /* 采购长度 5 档：与表格行数输入框同字号；收窄宽度保证标签+5档在一行内放下 */
+  #fixedLenWrap label{font-size:12px; gap:3px; flex:0 0 auto;}   /* 采购长度标签：移动端紧凑，避免撑爆一行 */
+  .modal-body{font-size:14px;}
+  .modal-mask{padding:0;}   /* 移动端：说明模态框 98vw 需贴边（与 37 页一致），遮罩去掉左右内边距 */
+  .modal-help{width:98vw;max-width:98vw;}   /* 说明模态框：移动端与 37 页一致（98vw） */
+  .plan-table{font-size:13px;}
+  #btnCalc{font-size:16px; height:40px; padding:0;}
+  #btnClear{font-size:16px; height:40px; padding:0;}
+  #tableWrap{margin:2px 0;}   /* 移动端：表格占满屏幕宽度（桌面保持 2px 10px 原样） */
+  #plan{margin:2px 0 0;}   /* 移动端：计算结果（排料表方案）占满屏幕宽度（桌面保持 2px 10px 0 原样） */
+}
+@media print{
+  .mui-bar-nav,.mui-bar-tab{display:none !important;}
+  #app{padding:0; height:auto; overflow:visible;}
+  #plan{max-height:none; overflow:visible;}
+  .btnbar{display:none;}
+}
+</style>
+</head>
+<body>
+   
+    <header id="标题栏1" class="mui-bar mui-bar-nav" style="background:#F7F7F7;">
+    	<a class="mui-icon mui-icon-left-nav mui-pull-left" style="color:#007AFF;"></a>
+    	<h1 class="mui-title" style="color:#0088FF;font-size:16px;font-weight:700;">钢筋配置计算</h1>
+    	<a class="mui-icon mui-icon-bars mui-pull-right" style="color:#007AFF;"></a>
+    </header>
+
+<style>
+		.mui-bar-tab{background: #F7F7F7;}
+		.mui-bar-tab .mui-tab-item{color: #8E8E8E;}
+		.mui-bar-tab .mui-tab-item.mui-active{color: #007AFF;}
+	</style>
+	<nav id="导航栏1" class="mui-bar mui-bar-tab">
+	</nav>
+
+<div id="app">
+  <div class="toolbar">
+    <div class="toolbar-line">
+      <span class="grp-left">
+        <button id="btnModeToggle" class="mode-btn active" type="button">裁料</button>
+        <label class="ctl-lbl">表格行数<input id="rowCount" type="number" min="1" max="100" value="6"></label>
+        <button id="btnWeldToggle" class="weld-btn active" type="button">双面焊</button>
+      </span>
+      <span class="grp-right">
+        <button id="btnDownload" class="tool-btn" type="button" disabled>下载</button>
+        <button id="btnReset" class="tool-btn" type="button">重置</button>
+        <button id="btnHelp" class="tool-btn" type="button">说明</button>
+      </span>
+    </div>
+    <div class="ctl-row hidden" id="fixedLenWrap" style="align-items:center;gap:5px;flex-wrap:wrap;">
+      <label>采购长度</label>
+      <input class="fixed-len-input" type="text" placeholder="1档" inputmode="decimal">
+      <input class="fixed-len-input" type="text" placeholder="2档" inputmode="decimal">
+      <input class="fixed-len-input" type="text" placeholder="3档" inputmode="decimal">
+      <input class="fixed-len-input" type="text" placeholder="4档" inputmode="decimal">
+      <input class="fixed-len-input" type="text" placeholder="5档" inputmode="decimal">
+    </div>
+  </div>
+
+  <div id="tableWrap">
+    <table>
+      <thead><tr id="headRow"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div id="plan" class="hidden"></div>
+
+  <div class="btnbar">
+    <button id="btnClear" type="button">清空</button>
+    <button id="btnCalc" type="button">开始计算</button>
+  </div>
+</div>
+
+<div id="toastWrap"></div>
+
+<!-- ===== 说明模态框 ===== -->
+<div id="helpMask" class="modal-mask hidden">
+  <div class="modal modal-help">
+    <div class="modal-head">
+      <h2>软件使用说明</h2>
+    </div>
+    <div class="modal-body">
+      <h3>一、功能</h3>
+      <ul>
+		<li>钢筋配料优化：同直径的原材料与需求合并考虑，自动按接头拆段，以<b>废料最少</b>为目标输出裁切 / 购买方案</li>
+	    <li>裁料计算/购买计算中，点击<b>重置</b>按钮，会清空所有结果，按照默认示例进行计算并显示结果。</li>
+	  </ul>
+	  <h3>二、裁料计算</h3>
+      <ol>
+        <li>填写原材料（已知长度、已知数量）与需求（需求长度、需求数量）、接头限制、搭接长度</li>
+        <li>点击 <code>开始计算</code>，下方显示<b>裁切方案（排料表）</b>：每根原材料怎么切、切几根、每根余料</li>
+      </ol>
+      <h3>三、购买计算</h3>
+      <ol>
+        <li>只填需求、接头限制、搭接长度；如采用固定购买长度，需输入数据，否则按常见尺寸计算</li>
+        <li><b>固定购买长度可填 1–5 档</b>：程序在已填档位间做<b>组合购买</b>，推荐废料最少方案（选中档位绿色高亮）</li>
+        <li>全部留空：自动搜索常见定尺（4m/6m/9m）中<b> 废料最少的组合购买长度 </b>。</li>
+      </ol>
+      <h3>四、开始计算</h3>
+      <ul>
+        <li>任何数据变更、行数修改或正/反算切换后<b>结果自动清空</b>，需重新点击开始计算</li>
+        <li>单件下料 = 需求长度 + 接头数 × 2 × 搭接长度（接头两侧各占一段）</li>
+        <li>需求太长且接头不足的行标记为不可满足，请提高接头限制或使用更长原材料</li>
+      </ul>
+      <h3>五、搭接长度（国标 JGJ 18-2012 电弧焊）</h3>
+      <ul><li>单面焊 ≥ <b>10×直径</b>，双面焊 ≥ <b>5×直径</b>（输入直径或切换焊接方式后自动填入）</li></ul>
+      <h3>六、下载报告</h3>
+      <ul><li>计算完成后点击 <code>下载</code>，生成横向 Word 文档（.docx）：已知数据表 + 排料方案</li></ul>
+      <h3>七、注意事项</h3>
+      <ul>
+        <li>长度单位一律为毫米(mm)，按 1mm 精度计算</li>
+        <li>裁料计算原材料不足时提示缺口并尽量满足部分需求</li>
+        <li>数量极大（总量超 10 万件）时购买计算优化较慢，建议使用固定购买长度或分批</li>
+      </ul>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" type="button" id="btnHelpClose">关 闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 重置确认模态框（与 37 页一致：确认后重置） ===== -->
+<div class="mask" id="resetMask" style="display:none">
+  <div class="confirm-box">
+    <div class="modal-title">重置</div>
+    <div class="modal-msg">确定重置为示例数据吗？<br>将重置：直径、搭接长度、长度、数量等为示例数据，并自动计算。</div>
+    <div class="modal-actions">
+      <button class="btn" type="button" id="resetCancel">取 消</button>
+      <button class="btn primary" type="button" id="resetOk">确 定</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 云支付：弹出面板（微信支付二维码） ===== -->
+<div id="弹出面板1" class="mui-popover">
+  <div class="mui-scroll-wrapper">
+    <div class="mui-scroll">
+	  <label id="标签57" style="display:block;width:100%;color:#000000;font-size:14px;margin:0px 0px 0px 0px;padding:0px;text-align:center">钢筋配置计算需单独付费<br>微信支付码于10分钟后关闭</label>
+      <div id="二维码1" style="margin-left:auto;margin-right:auto;padding:5px;"></div>      
+    </div>
+  </div>
+</div>
+
+<script src="js/mui.min.js"></script>
+<script src="gongyongmokuai.js"></script>
+<script src="js/bluebird_math.js"></script>
+<script src="js/bluebird_string.js"></script>
+<script src="js/bluebird_localStorage.js"></script>
+<script src="js/bluebird_window.js"></script>
+<script src="js/bluebird_convert.js"></script>
+<script src="js/bluebird_titleBar.js"></script>
+<script src="js/bluebird_tabBar.js"></script>
+<script src="js/bluebird_button.js"></script>
+<script src="js/bluebird_dialogBox.js"></script>
+<script src="js/bluebird_ajax.js"></script>
+<script src="js/bluebird_timer.js"></script>
+<script src="js/bluebird_pay.js"></script>
+<script src="js/bluebird_popover.js"></script>
+<script src="js/makeqrcode.js"></script>
+<script src="js/qrcode.js"></script>
+<script src="js/bluebird_screenshot.js"></script>
+<script src="js/html2canvas.js"></script>
+<script src="chuangkou36.js"></script>
+</body>
+</html>

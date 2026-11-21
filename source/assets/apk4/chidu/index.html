@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123a5a">
+<title>弛度现场计算</title>
+<style>
+  :root{
+    --navy:#123a5a; --navy2:#1b4d73; --line:#dbe4ec; --bg:#eef2f6;
+    --ink:#16232e; --muted:#6a7c8c; --orange:#e8620a; --green:#1f7a52; --red:#c0392b;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
+    background:var(--bg); color:var(--ink); font-size:16px; line-height:1.45;
+    padding-bottom:28px;
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:0 12px}
+  header{
+    background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 100%);
+    color:#fff;padding:16px 12px 14px;box-shadow:0 2px 10px rgba(18,58,90,.28);
+  }
+  header .inner{max-width:560px;margin:0 auto}
+  header h1{font-size:19px;margin:0 0 2px;letter-spacing:.5px;font-weight:600}
+  header p{margin:0;font-size:12px;opacity:.78}
+  .meta{display:flex;gap:8px;margin-top:10px}
+  .meta .f{flex:1}
+  .meta label{display:block;font-size:11px;opacity:.8;margin-bottom:3px}
+  .meta input{
+    width:100%;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);
+    color:#fff;border-radius:8px;padding:8px 10px;font-size:14px;outline:none;
+  }
+  .meta input::placeholder{color:rgba(255,255,255,.55)}
+  nav{
+    display:flex;background:#fff;border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:20;box-shadow:0 1px 6px rgba(0,0,0,.05)
+  }
+  nav button{
+    flex:1;border:0;background:transparent;padding:13px 4px 11px;font-size:15px;
+    color:var(--muted);font-family:inherit;font-weight:500;position:relative;cursor:pointer;
+  }
+  nav button.on{color:var(--navy);font-weight:700}
+  nav button.on::after{
+    content:"";position:absolute;left:14%;right:14%;bottom:0;height:3px;
+    background:var(--orange);border-radius:3px 3px 0 0;
+  }
+  .card{
+    background:var(--card);border-radius:12px;margin-top:12px;padding:12px 12px 6px;
+    box-shadow:0 1px 4px rgba(18,58,90,.08);border:1px solid #e6edf3;
+  }
+  .card h2{
+    font-size:13px;color:var(--navy);margin:2px 0 10px;font-weight:700;
+    letter-spacing:.4px;display:flex;align-items:center;gap:6px;
+  }
+  .card h2::before{content:"";width:3px;height:13px;background:var(--orange);border-radius:2px}
+  .row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  #dy_beta::placeholder,#dw_t1::placeholder,#dw_t2::placeholder{font-size:14px;color:#93a5b4}
+  .row label{width:104px;flex:none;font-size:14px;color:#33475b}
+  .row .inp{flex:1;position:relative}
+  .row input,.row select{
+    width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;
+    font-size:17px;font-family:inherit;color:var(--ink);background:#fbfdfe;
+    outline:none;font-variant-numeric:tabular-nums;
+  }
+  .row input:focus,.row select:focus{border-color:var(--navy2);background:#fff;box-shadow:0 0 0 3px rgba(27,77,115,.10)}
+  .row select{font-size:16px;padding:10px 8px}
+  #dy_label.empty,#dw_label.empty{font-size:14px;color:#93a5b4}
+  .row .unit{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);pointer-events:none}
+  .row .unit+input{padding-right:38px}
+  .hint{font-size:11.5px;color:var(--muted);margin:-5px 0 9px 112px;line-height:1.35}
+  .hint b{color:var(--navy2);font-weight:600}
+  .selph{display:none;width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 12px;box-sizing:border-box;font-size:14px;line-height:1.4;color:#93a5b4;background:#fbfdfe;cursor:pointer}
+  .afnote{font-size:11.5px;color:var(--muted);line-height:1.4;padding:8px 14px 10px;margin:0}
+  .afnote b{color:var(--navy2);font-weight:600}
+  .res{background:#fff;border-radius:12px;margin-top:12px;border:1px solid #e6edf3;
+       box-shadow:0 1px 4px rgba(18,58,90,.08);overflow:hidden}
+  .res .hd{background:var(--navy);color:#fff;padding:9px 14px;font-size:13px;letter-spacing:.5px;font-weight:600}
+  .big{padding:14px 14px 6px}
+  .big .k{font-size:12.5px;color:var(--muted);margin-bottom:2px}
+  .big .v{font-size:23px;font-weight:700;color:var(--navy);line-height:1.15;font-variant-numeric:tabular-nums}
+  .big .v small{font-size:11px;font-weight:500;color:var(--muted);margin-left:4px}
+  .big .sub{font-size:12px;color:var(--muted);margin-top:3px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-top:10px}
+  .grid .c{background:#fff;padding:9px 12px}
+  .grid .c .k{font-size:11.5px;color:var(--muted)}
+  .grid .c .v{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .grid .c .v small{font-size:11.5px;color:var(--muted);font-weight:400}
+  .grid .full{grid-column:1/-1}
+  .warn{margin:10px 12px 0;padding:9px 11px;border-radius:9px;font-size:13px;line-height:1.4;
+        background:#fff4ec;color:#a34a04;border:1px solid #ffd7ba}
+  .warn.bad{background:#fdecea;color:#a4271c;border-color:#f6c6c1}
+  /* 公式展示 */
+  .formula{margin:12px 12px 0;border:1px solid #e2eaf1;border-radius:10px;background:#f9fbfd;padding:10px 12px 12px}
+  .formula .fk{font-size:12px;color:var(--navy);font-weight:700;margin-bottom:8px}
+  .formula img{max-width:100%;display:block;margin:0 auto;background:#fff;border-radius:6px}
+  .formula .fsym{font-size:12px;color:#3f5567;margin-top:9px;line-height:1.65}
+  .formula .fsym b{color:var(--navy2);font-weight:600}
+  .formula .subst{
+    margin-top:9px;padding:8px 10px;border-radius:8px;background:#fff;
+    border:1px dashed #cbd9e4;font-size:12.5px;color:#16232e;
+    font-variant-numeric:tabular-nums;line-height:1.6;word-break:break-word;
+  }
+  .formula .subst .lbl{color:var(--muted);font-size:11.5px;display:block;margin-bottom:3px}
+  .acts{display:flex;gap:8px;padding:12px}
+  .acts button{flex:1;border:1px solid var(--line);background:#f7fafc;color:var(--navy2);
+    padding:11px;border-radius:10px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer}
+  #pane-tb .acts button{font-size:12px;padding:10px}
+  .acts button.pri{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .acts button.danger{color:#a4271c;border-color:#f0cbc7;background:#fdf3f2}
+  .acts button:active{opacity:.8}
+  details{margin:0 12px 12px;font-size:12.5px;color:#3f5567}
+  details summary{cursor:pointer;color:var(--navy2);font-weight:600;padding:4px 0;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸ ";color:var(--orange)}
+  details[open] summary::before{content:"▾ "}
+  details .pr{margin-top:6px;border-top:1px dashed #dfe8ef;padding-top:6px}
+  details .pr div{display:flex;justify-content:space-between;padding:2px 0;gap:10px}
+  details .pr div span:last-child{font-variant-numeric:tabular-nums;color:#16232e}
+  /* 可编辑系数表 */
+  .tblbox{overflow-x:auto;margin:0;padding:0 0 8px}
+  table{border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+  th,td{border:1px solid #e2eaf1;padding:5px 7px;text-align:right;white-space:nowrap}
+  th{background:#f2f6f9;color:#33506b;font-weight:600;position:sticky;top:0;z-index:3}
+  td.tcol{background:#f7fafc;font-weight:600;position:sticky;left:0;z-index:2;text-align:center}
+  th.tcol{left:0;z-index:4}
+  .hit{background:#fff0e2!important;font-weight:700;color:#b04907!important}
+  table.edit td{padding:0}
+  table.edit th{padding:0}
+  table.edit .cell{
+    width:100%;min-width:66px;border:0;padding:6px 7px;font-size:12px;font-family:inherit;
+    text-align:right;background:transparent;color:inherit;font-variant-numeric:tabular-nums;
+    outline:none;border-radius:0
+  }
+  table.edit th .cell{text-align:center;font-weight:600;color:#33506b;background:#f2f6f9;min-width:66px}
+  table.edit td.tcol .cell{text-align:center;font-weight:600;background:#f7fafc}
+  table.edit .cell:focus{background:#fff3e6;box-shadow:inset 0 0 0 1.5px var(--orange);color:#16232e}
+  .legend{font-size:12px;color:var(--muted);padding:0 12px 10px;line-height:1.55}
+  .paste{margin:0 0 10px;border:1px dashed #c3d4e2;border-radius:10px;padding:10px;background:#f9fbfd}
+  .paste textarea{
+    width:100%;min-height:104px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+    font-size:13px;font-family:inherit;line-height:1.45;background:#fff;color:var(--ink);
+    outline:none;resize:vertical
+  }
+  .paste textarea:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(27,77,115,.10)}
+  .paste .tip{font-size:11.5px;color:var(--muted);line-height:1.6;margin:7px 0 9px}
+  .modes{display:flex;flex-wrap:wrap;gap:7px 14px;margin:2px 0 0}
+  .modes label{display:flex;align-items:center;gap:5px;font-size:12.5px;color:#33475b}
+  .modes input{accent-color:#123a5a;width:15px;height:15px;margin:0}
+  .linkbtn{background:none;border:0;color:var(--muted);font-size:12px;font-family:inherit;
+    padding:6px 0;text-decoration:underline;cursor:pointer}
+  .note{font-size:12px;color:var(--muted);line-height:1.65;padding:0 4px 4px}
+  .note b{color:var(--navy2)}
+  .foot{text-align:center;font-size:11px;color:#9aa9b6;padding:18px 0 0}
+  .hide{display:none}
+
+.lock-ov{position:fixed;inset:0;background:rgba(246,249,252,.985);z-index:999;overflow:auto;padding:10px}
+.lk-in{padding:12px 6px;text-align:center}
+.lk-t{font-size:19px;font-weight:800;color:var(--navy)}
+.lk-s{font-size:12.5px;color:#b23;margin:6px 0 12px}
+.lk-row{display:flex;align-items:center;gap:8px;justify-content:center;font-size:12.5px;color:#33475b;margin-bottom:12px;flex-wrap:wrap}
+.lk-row b{font-family:ui-monospace,Consolas,monospace;font-size:17px;letter-spacing:1.5px;color:var(--navy);background:#eef4fa;border:1px solid #cfe0ee;border-radius:8px;padding:5px 10px}
+.lk-row button{border:1px solid #cfe0ee;background:#fff;color:var(--navy);border-radius:8px;padding:5px 10px;font-size:12px}
+.lk-qr img{width:190px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.lk-price{display:flex;gap:10px;justify-content:center;margin:12px 0 8px}
+.lk-p{flex:1;max-width:150px;border:1px solid #e2ecf5;border-radius:10px;padding:9px 6px;background:#f7fbff}
+.lk-p b{display:block;font-size:13px;color:#33475b}
+.lk-p span{display:block;font-size:19px;font-weight:800;color:var(--orange);margin-top:2px}
+.lk-how{font-size:12px;color:var(--muted);line-height:1.65;margin:6px 4px 12px}
+.lk-act{display:flex;gap:8px}
+.lk-act input{flex:1;min-width:0;border:1px solid #d5e2ee;border-radius:10px;padding:10px 12px;font-size:14px;letter-spacing:.5px}
+.lk-act button{border:0;background:var(--navy);color:#fff;border-radius:10px;padding:10px 16px;font-size:14px}
+.lk-diag{font-size:11px;color:#8fa2b3;margin-top:4px;text-align:center;line-height:1.5}
+.lk-foot{font-size:11.5px;color:#93a5b4;margin-top:10px}
+
+</style>
+</head>
+<body>
+
+<!-- 顶部标题区已隐藏（保持界面整洁）；档号、观测日期输入框保留但不可见，供记录与存档用 -->
+<div style="display:none">
+  <input id="mStake" placeholder="如 331-332">
+  <input id="mDate" placeholder="2026-11-07">
+</div>
+
+<nav>
+  <button data-tab="dy" class="on">档端角度法</button>
+  <button data-tab="dw">档外角度法</button>
+  <button data-tab="tb">百米弧垂表</button>
+</nav>
+<div class="app-hero">
+  <div class="hero-inner">
+    <div><strong>弛度现场计算</strong><span>离线计算 · 自动保存 · 本机数据</span></div>
+    <button type="button" onclick="showFieldHelp()">填写说明</button>
+  </div>
+</div>
+<div class="quick-note"><b>现场提示：</b>先在“百米弧垂表”录入或粘贴表格，再填写观测参数；计算结果会随输入实时更新。</div>
+
+<div class="wrap">
+
+<!-- ============ 档端 ============ -->
+<section id="pane-dy">
+  <div class="card">
+    <h2>观测参数</h2>
+    <div class="row"><label>百米弧垂表选择</label><div class="inp"><select id="dy_label"></select><div class="selph" id="dy_label_ph" onclick="document.querySelectorAll('nav button')[2].click()">去百米弧垂表新建</div></div></div>
+    <div class="hint hide" id="dy_label_hint">去百米弧垂表新建</div>
+    <div class="row"><label>观测温度</label><div class="inp"><span class="unit">℃</span><input id="dy_temp" inputmode="decimal"></div></div>
+    <div class="row"><label>代表档距</label><div class="inp"><span class="unit">m</span><input id="dy_lrep" inputmode="decimal"></div></div>
+    <div class="row"><label>观测档距</label><div class="inp"><span class="unit">m</span><input id="dy_lobs" inputmode="decimal"></div></div>
+    <div class="row"><label>滑车角 β</label><div class="inp"><input id="dy_beta" inputmode="decimal" placeholder="仰角为正，俯角为负"></div></div>
+    <div class="hint" id="dy_beta_h">度分秒写法：3.0333 = 3°3′33″</div>
+    <div class="row"><label>挂点呼高</label><div class="inp"><span class="unit">m</span><input id="dy_h" inputmode="decimal"></div></div>
+    <div class="row"><label>金具串长</label><div class="inp"><span class="unit">m</span><input id="dy_fit" inputmode="decimal"></div></div>
+    <div class="row"><label>仪器高 i</label><div class="inp"><span class="unit">m</span><input id="dy_ih" inputmode="decimal"></div></div>
+    <div class="row"><label>检验角度 α</label><div class="inp"><input id="dy_chk" inputmode="decimal"></div></div>
+    <div class="row"><label>耐张段长</label><div class="inp"><span class="unit">m</span><input id="dy_tens" inputmode="decimal"></div></div>
+  </div>
+
+  <div class="res">
+    <div class="hd">计算结果</div>
+    <div class="big">
+      <div class="k" id="dy_o_ang_k">观测角度</div>
+      <div class="v" id="dy_o_ang">—</div>
+      <div class="sub" id="dy_o_ang2"></div>
+    </div>
+    <div class="big" style="padding-top:2px">
+      <div class="k">观测弧垂 f</div>
+      <div class="v" id="dy_o_f">—<small>m</small></div>
+      <div class="sub" id="dy_o_coef"></div>
+    </div>
+    <div class="big" style="padding-top:2px">
+      <div class="k">检验弧垂 f′</div>
+      <div class="v" id="dy_o_f2">—</div>
+    </div>
+    <div class="grid">
+      <div class="c" style="display:none"><div class="k">A值（呼高−串长−仪高）</div><div class="v" id="dy_o_a">—</div></div>
+      <div class="c" style="display:none"><div class="k">高差角 cosθ</div><div class="v" id="dy_o_cos">—</div></div>
+      <div class="c"><div class="k">弧垂差值</div><div class="v" id="dy_o_diff">—</div></div>
+      <div class="c"><div class="k">调整线长 ΔL</div><div class="v" id="dy_o_adj">—</div></div>
+    </div>
+    <div id="dy_warn"></div>
+    <div class="afnote">注：a/f 推荐值为 [0.408～1.853]，当大于 3 时谨慎使用！当前值：<b id="dy_af">—</b></div>
+    <details class="fold">
+      <summary>弧垂计算公式</summary>
+      <div class="formula">
+        <div class="fk" id="dy_f_title">弧垂计算公式 · 公式2</div>
+        <img id="dy_f_img" alt="弧垂计算公式">
+        <div class="fsym" id="dy_f_sym"></div>
+        <div class="subst" id="dy_f_subst"></div>
+      </div>
+    </details>
+    <details>
+      <summary>计算步骤</summary>
+      <div class="pr" id="dy_steps"></div>
+    </details>
+    <div class="acts">
+      <button class="pri" onclick="copyRes('dy')">复制结果</button>
+      <button onclick="resetAll('dy')">清空重填</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 档外 ============ -->
+<section id="pane-dw" class="hide">
+  <div class="card">
+    <h2>观测参数</h2>
+    <div class="row"><label>百米弧垂表选择</label><div class="inp"><select id="dw_label"></select><div class="selph" id="dw_label_ph" onclick="document.querySelectorAll('nav button')[2].click()">去百米弧垂表新建</div></div></div>
+    <div class="hint hide" id="dw_label_hint">去百米弧垂表新建</div>
+    <div class="row"><label>观测温度</label><div class="inp"><span class="unit">℃</span><input id="dw_temp" inputmode="decimal"></div></div>
+    <div class="row"><label>代表档距</label><div class="inp"><span class="unit">m</span><input id="dw_lrep" inputmode="decimal"></div></div>
+    <div class="row"><label>临近档距</label><div class="inp"><span class="unit">m</span><input id="dw_l1" inputmode="decimal"></div></div>
+    <div class="row"><label>观测档距</label><div class="inp"><span class="unit">m</span><input id="dw_lobs" inputmode="decimal"></div></div>
+    <div class="row"><label>切线角 近端</label><div class="inp"><input id="dw_t1" inputmode="decimal" placeholder="仰角为正，俯角为负"></div></div>
+    <div class="row"><label>切线角 远端</label><div class="inp"><input id="dw_t2" inputmode="decimal" placeholder="仰角为正，俯角为负"></div></div>
+    <div class="hint" id="dw_t_h">度分秒写法：3.0333 = 3°3′33″</div>
+    <div class="row"><label>检验角度 α</label><div class="inp"><input id="dw_chk" inputmode="decimal"></div></div>
+    <div class="row"><label>耐张段长</label><div class="inp"><span class="unit">m</span><input id="dw_tens" inputmode="decimal"></div></div>
+  </div>
+
+  <div class="res">
+    <div class="hd">计算结果</div>
+    <div class="big">
+      <div class="k" id="dw_o_ang_k">观测角度</div>
+      <div class="v" id="dw_o_ang">—</div>
+      <div class="sub" id="dw_o_ang2"></div>
+    </div>
+    <div class="big" style="padding-top:2px">
+      <div class="k">观测弧垂 f</div>
+      <div class="v" id="dw_o_f">—<small>m</small></div>
+      <div class="sub" id="dw_o_coef"></div>
+    </div>
+    <div class="big" style="padding-top:2px">
+      <div class="k">检验弧垂 f′</div>
+      <div class="v" id="dw_o_f2">—</div>
+    </div>
+    <div class="grid">
+      <div class="c" style="display:none"><div class="k">A值</div><div class="v" id="dw_o_a">—</div></div>
+      <div class="c" style="display:none"><div class="k">h 值</div><div class="v" id="dw_o_h">—</div></div>
+      <div class="c" style="display:none"><div class="k">高差角 cosθ</div><div class="v" id="dw_o_cos">—</div></div>
+      <div class="c"><div class="k">弧垂差值</div><div class="v" id="dw_o_diff">—</div></div>
+      <div class="c"><div class="k">调整线长 ΔL</div><div class="v" id="dw_o_adj">—</div></div>
+    </div>
+    <div id="dw_warn"></div>
+    <div class="afnote">注意：a′/f 推荐值为 [0.408～1.853]，当大于 3 时谨慎使用！当前值：<b id="dw_af">—</b></div>
+    <details class="fold">
+      <summary>弧垂计算公式</summary>
+      <div class="formula">
+        <div class="fk" id="dw_f_title">弧垂计算公式 · 公式2</div>
+        <img id="dw_f_img" alt="弧垂计算公式">
+        <div class="fsym" id="dw_f_sym"></div>
+        <div class="subst" id="dw_f_subst"></div>
+      </div>
+    </details>
+    <details>
+      <summary>计算步骤</summary>
+      <div class="pr" id="dw_steps"></div>
+    </details>
+    <div class="acts">
+      <button class="pri" onclick="copyRes('dw')">复制结果</button>
+      <button onclick="resetAll('dw')">清空重填</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 系数表 ============ -->
+<section id="pane-tb" class="hide">
+  <div class="card">
+    <h2>弧垂表 · 可编辑</h2>
+    <div class="row"><label>新建百米弧垂表</label><div class="inp"><select id="tb_sel"></select></div></div>
+    <div class="row"><label>表重命名</label><div class="inp"><input id="tb_name" placeholder="如导线"></div></div>
+    <div class="row"><label>弧垂公式选择</label><div class="inp"><select id="fx_formula">
+      <option value="2" selected>公式2：fₓ = f₍₁₀₀₎÷cosB×(Lₓ/100)²</option>
+      <option value="1">公式1：f = fp × (L/Lp)² × [1 + 4fp²L²/(3Lp⁴)] ÷ cos B</option>
+    </select>
+      <div class="hint" style="margin:4px 0 0">请根据百米弧垂表中公式对应选择，如没有联系作者添加。</div>
+    </div></div>
+    <div class="acts" style="padding:4px 0 8px">
+      <button class="danger" onclick="clearTable()">清空本表数据</button>
+      <button onclick="togglePaste()">从 Excel 粘贴</button>
+      <button onclick="addRow()">添加行</button>
+      <button onclick="addCol()">添加列</button>
+    </div>
+    <button class="linkbtn" onclick="restoreTable()">点这里恢复清除的数据</button>
+    <button class="linkbtn" onclick="restoreFromBackup()">一键恢复备份数据</button>
+  </div>
+  <div class="card">
+    <h2>表格数据（点格子改 / 直接粘贴）</h2>
+    <div id="pastePanel" class="paste hide">
+      <textarea id="pasteBox" placeholder="在 Excel 里选中数据区域 → 复制 → 长按这里粘贴"></textarea>
+      <div class="modes">
+        <label><input type="radio" name="pmode" value="full" checked> 整表（含温度和档距表头）</label>
+        <label><input type="radio" name="pmode" value="auto"> 自动识别</label>
+        <label><input type="radio" name="pmode" value="data"> 只当数据</label>
+      </div>
+      <div class="tip">
+        <b>整表</b>：把 Excel 里连第一行（档距）、第一列（温度）一起复制过来，温度和档距就换成你自己的数据，行列数也跟着变；左上角那格写不写“℃\档距”都行，空着也行。
+      </div>
+      <div class="acts" style="padding:0">
+        <button class="pri" onclick="doPaste()">粘到本表</button>
+        <button onclick="togglePaste()">收起</button>
+      </div>
+    </div>
+    <div class="tblbox" id="tb_table"></div>
+    <div class="legend" id="tb_legend"></div>
+    <div class="note" style="padding-bottom:6px">
+      改完自动保存到本机，并立刻参与计算。也能在格子里 <b>Ctrl+V / 长按粘贴</b> Excel 复制的整块数据。表头（温度、档距）同样能改，但须保持从小到大排列，否则插值会不准。
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script id="calc">
+var ORIGINAL = [{"name":"1","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[0.2744,0.2821,0.2919,0.3038,0.3181,0.339,0.372,0.4097,0.4504,0.4914,0.5304,0.5659,0.5973,0.6246,0.6483,0.6687,0.6864,0.7018,0.7152,0.7269,0.7372,0.7463,0.7544,0.7617,0.7681,0.7739,0.7792,0.7839,0.7882,0.7921,0.7957,0.799,0.802,0.8047,0.8073,0.8096,0.8118,0.8138,0.8157,0.8174,0.819,0.8205,0.822,0.8233,0.8245],[0.3022,0.3111,0.3222,0.3358,0.3518,0.375,0.4111,0.4507,0.4914,0.5308,0.5669,0.5991,0.6271,0.6513,0.6722,0.6901,0.7057,0.7192,0.731,0.7413,0.7504,0.7585,0.7656,0.772,0.7777,0.7828,0.7875,0.7917,0.7955,0.7989,0.8021,0.805,0.8076,0.8101,0.8123,0.8144,0.8164,0.8181,0.8198,0.8213,0.8228,0.8241,0.8254,0.8266,0.8277],[0.3359,0.3461,0.3589,0.3741,0.3916,0.4168,0.4551,0.4952,0.5344,0.5709,0.6035,0.6319,0.6564,0.6775,0.6956,0.7112,0.7247,0.7364,0.7466,0.7556,0.7635,0.7705,0.7767,0.7822,0.7872,0.7917,0.7957,0.7993,0.8027,0.8057,0.8084,0.811,0.8133,0.8154,0.8174,0.8192,0.8209,0.8225,0.8239,0.8253,0.8265,0.8277,0.8288,0.8299,0.8308],[0.3776,0.3892,0.4034,0.4199,0.4383,0.4644,0.5035,0.5423,0.5786,0.6112,0.6397,0.6642,0.6852,0.7032,0.7186,0.7319,0.7433,0.7533,0.762,0.7696,0.7763,0.7823,0.7876,0.7923,0.7966,0.8004,0.8038,0.807,0.8098,0.8124,0.8148,0.8169,0.8189,0.8207,0.8224,0.824,0.8254,0.8268,0.828,0.8292,0.8303,0.8313,0.8322,0.8331,0.834],[0.43,0.4427,0.4578,0.4747,0.4926,0.5179,0.5558,0.5914,0.6235,0.6515,0.6755,0.696,0.7135,0.7284,0.7412,0.7522,0.7616,0.7699,0.7771,0.7834,0.789,0.794,0.7984,0.8023,0.8059,0.809,0.8119,0.8145,0.8169,0.819,0.821,0.8228,0.8245,0.826,0.8274,0.8287,0.83,0.8311,0.8321,0.8331,0.834,0.8348,0.8356,0.8364,0.8371],[0.4971,0.5098,0.5241,0.5392,0.5543,0.5765,0.6107,0.6415,0.6683,0.6913,0.7107,0.7272,0.7412,0.7531,0.7633,0.7721,0.7797,0.7862,0.792,0.7971,0.8015,0.8055,0.809,0.8122,0.815,0.8176,0.8199,0.822,0.8239,0.8257,0.8272,0.8287,0.83,0.8313,0.8324,0.8335,0.8344,0.8353,0.8362,0.837,0.8377,0.8384,0.839,0.8396,0.8402],[0.5841,0.5936,0.6036,0.6133,0.6225,0.6389,0.6673,0.6919,0.7128,0.7304,0.7453,0.7578,0.7683,0.7773,0.785,0.7916,0.7974,0.8023,0.8067,0.8105,0.8139,0.8169,0.8196,0.822,0.8241,0.8261,0.8278,0.8294,0.8309,0.8322,0.8334,0.8345,0.8355,0.8365,0.8374,0.8382,0.8389,0.8396,0.8402,0.8408,0.8414,0.8419,0.8424,0.8429,0.8433],[0.6969,0.6965,0.6962,0.6959,0.6956,0.7037,0.7245,0.7421,0.7567,0.7689,0.7791,0.7877,0.7949,0.801,0.8063,0.8108,0.8148,0.8182,0.8212,0.8238,0.8261,0.8282,0.83,0.8317,0.8332,0.8345,0.8357,0.8368,0.8378,0.8387,0.8396,0.8403,0.841,0.8417,0.8423,0.8428,0.8433,0.8438,0.8443,0.8447,0.8451,0.8454,0.8458,0.8461,0.8464],[0.8394,0.8178,0.7995,0.7842,0.7716,0.7695,0.7816,0.7915,0.7997,0.8065,0.8122,0.8169,0.8209,0.8243,0.8272,0.8297,0.8319,0.8338,0.8354,0.8369,0.8382,0.8393,0.8403,0.8413,0.8421,0.8428,0.8435,0.8441,0.8447,0.8452,0.8457,0.8461,0.8465,0.8468,0.8472,0.8475,0.8478,0.848,0.8483,0.8485,0.8487,0.8489,0.8491,0.8493,0.8495]],"blank":false},{"name":"2","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[0.2744,0.2821,0.2919,0.3038,0.3294,0.3619,0.4007,0.4443,0.4898,0.5341,0.5748,0.6108,0.642,0.6689,0.6919,0.7116,0.7286,0.7433,0.7562,0.7674,0.7772,0.7859,0.7936,0.8005,0.8066,0.8121,0.8171,0.8216,0.8257,0.8294,0.8328,0.8359,0.8387,0.8414,0.8438,0.846,0.848,0.85,0.8517,0.8534,0.8549,0.8564,0.8577,0.859,0.8602],[0.3022,0.3111,0.3222,0.3358,0.3651,0.4016,0.4434,0.4882,0.5327,0.5742,0.6113,0.6435,0.6711,0.6947,0.7149,0.7323,0.7472,0.7601,0.7714,0.7812,0.7899,0.7975,0.8043,0.8104,0.8158,0.8207,0.8251,0.829,0.8327,0.8359,0.8389,0.8417,0.8442,0.8465,0.8486,0.8506,0.8524,0.8541,0.8557,0.8572,0.8585,0.8598,0.861,0.8621,0.8632],[0.3359,0.3461,0.3589,0.3741,0.4073,0.4472,0.4908,0.535,0.5769,0.6146,0.6474,0.6756,0.6996,0.7201,0.7376,0.7525,0.7654,0.7766,0.7864,0.7949,0.8024,0.809,0.8149,0.8202,0.8249,0.8291,0.833,0.8364,0.8396,0.8424,0.845,0.8474,0.8496,0.8516,0.8535,0.8552,0.8568,0.8583,0.8597,0.861,0.8622,0.8633,0.8643,0.8653,0.8662],[0.3776,0.3892,0.4034,0.4199,0.4566,0.4988,0.5422,0.5839,0.6217,0.6548,0.6831,0.7072,0.7276,0.745,0.7598,0.7724,0.7834,0.7929,0.8011,0.8084,0.8148,0.8204,0.8254,0.8299,0.8339,0.8375,0.8408,0.8437,0.8464,0.8489,0.8511,0.8531,0.855,0.8567,0.8583,0.8598,0.8612,0.8624,0.8636,0.8647,0.8657,0.8667,0.8676,0.8684,0.8692],[0.43,0.4427,0.4578,0.4747,0.5136,0.5557,0.5966,0.6339,0.6665,0.6945,0.7182,0.7382,0.755,0.7693,0.7815,0.792,0.801,0.8089,0.8157,0.8217,0.8269,0.8316,0.8358,0.8395,0.8428,0.8458,0.8485,0.851,0.8532,0.8553,0.8571,0.8588,0.8604,0.8618,0.8631,0.8644,0.8655,0.8666,0.8675,0.8685,0.8693,0.8701,0.8709,0.8716,0.8722],[0.4971,0.5098,0.5241,0.5392,0.5777,0.6169,0.6528,0.6843,0.7111,0.7336,0.7526,0.7685,0.7819,0.7932,0.8029,0.8112,0.8184,0.8246,0.83,0.8348,0.839,0.8427,0.846,0.849,0.8517,0.8541,0.8562,0.8582,0.86,0.8616,0.8631,0.8645,0.8657,0.8669,0.8679,0.8689,0.8698,0.8707,0.8715,0.8722,0.8729,0.8735,0.8741,0.8747,0.8752],[0.5841,0.5936,0.6036,0.6133,0.6479,0.6811,0.71,0.7345,0.755,0.772,0.7862,0.7981,0.8081,0.8166,0.8239,0.8301,0.8354,0.8401,0.8442,0.8477,0.8509,0.8537,0.8562,0.8584,0.8604,0.8622,0.8639,0.8653,0.8667,0.8679,0.869,0.8701,0.871,0.8719,0.8727,0.8734,0.8741,0.8748,0.8754,0.8759,0.8764,0.8769,0.8774,0.8778,0.8782],[0.6969,0.6965,0.6962,0.6959,0.7222,0.7467,0.7671,0.7841,0.798,0.8096,0.8192,0.8272,0.8339,0.8396,0.8445,0.8486,0.8522,0.8554,0.8581,0.8605,0.8627,0.8646,0.8662,0.8677,0.8691,0.8703,0.8714,0.8724,0.8733,0.8742,0.8749,0.8756,0.8763,0.8769,0.8774,0.8779,0.8784,0.8788,0.8792,0.8796,0.88,0.8803,0.8806,0.8809,0.8812],[0.8394,0.8178,0.7995,0.7842,0.7988,0.8125,0.8237,0.8328,0.8402,0.8463,0.8513,0.8556,0.8591,0.8621,0.8647,0.8669,0.8688,0.8704,0.8719,0.8732,0.8743,0.8753,0.8762,0.877,0.8777,0.8784,0.8789,0.8795,0.88,0.8804,0.8808,0.8812,0.8815,0.8818,0.8821,0.8824,0.8826,0.8829,0.8831,0.8833,0.8835,0.8837,0.8838,0.884,0.8841]],"blank":false},{"name":"3","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800],"v":[[0.2915,0.3081,0.3491,0.4078,0.4872,0.5818,0.6766,0.7596,0.8274,0.8818,0.9253,0.9604,0.989,1.0127,1.0324,1.0491,1.0632,1.0753,1.0858,1.0949,1.1029,1.1099,1.1161,1.1216,1.1265,1.1309,1.1349,1.1385,1.1418],[0.3229,0.3425,0.3915,0.4602,0.5482,0.6444,0.7339,0.8088,0.8689,0.9168,0.9551,0.986,1.0113,1.0322,1.0496,1.0644,1.0769,1.0877,1.097,1.1051,1.1122,1.1184,1.124,1.1289,1.1333,1.1372,1.1408,1.144,1.1469],[0.3614,0.3847,0.4433,0.5222,0.6159,0.7094,0.7908,0.8569,0.9093,0.9509,0.9842,1.0111,1.0331,1.0514,1.0666,1.0795,1.0905,1.0999,1.1081,1.1152,1.1215,1.1269,1.1318,1.1361,1.14,1.1435,1.1466,1.1495,1.152],[0.4095,0.4372,0.5064,0.5941,0.6886,0.7752,0.847,0.9039,0.9488,0.9843,1.0127,1.0357,1.0546,1.0703,1.0834,1.0945,1.1039,1.1121,1.1191,1.1253,1.1306,1.1354,1.1396,1.1434,1.1467,1.1497,1.1524,1.1549,1.1571],[0.4708,0.5028,0.5826,0.6747,0.7644,0.8408,0.9019,0.9498,0.9872,1.0169,1.0406,1.0599,1.0757,1.0889,1.0999,1.1092,1.1172,1.1241,1.13,1.1352,1.1398,1.1438,1.1473,1.1505,1.1534,1.1559,1.1582,1.1603,1.1622],[0.5499,0.5849,0.6721,0.7619,0.8414,0.9056,0.9556,0.9944,1.0247,1.0487,1.068,1.0836,1.0965,1.1072,1.1162,1.1238,1.1303,1.136,1.1408,1.1451,1.1488,1.1521,1.155,1.1576,1.16,1.1621,1.164,1.1657,1.1672],[0.6527,0.686,0.7731,0.8529,0.9181,0.9688,1.0078,1.0378,1.0613,1.0799,1.0948,1.1069,1.1169,1.1253,1.1323,1.1382,1.1433,1.1477,1.1515,1.1549,1.1578,1.1604,1.1627,1.1647,1.1666,1.1682,1.1697,1.171,1.1723],[0.7843,0.8057,0.882,0.945,0.9936,1.0305,1.0585,1.0801,1.097,1.1103,1.1211,1.1298,1.1371,1.1431,1.1482,1.1525,1.1562,1.1594,1.1622,1.1646,1.1667,1.1686,1.1703,1.1718,1.1731,1.1743,1.1754,1.1764,1.1773],[0.9452,0.94,0.9946,1.0362,1.0672,1.0903,1.1078,1.1213,1.1318,1.1401,1.1469,1.1524,1.1569,1.1607,1.1639,1.1666,1.1689,1.1709,1.1727,1.1742,1.1756,1.1768,1.1778,1.1788,1.1796,1.1804,1.1811,1.1817,1.1823]],"blank":false},{"name":"4","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[0.2844,0.2875,0.3058,0.3338,0.3699,0.4146,0.4663,0.5212,0.5746,0.6229,0.6648,0.7005,0.7305,0.7559,0.7774,0.7957,0.8114,0.8249,0.8366,0.8468,0.8558,0.8637,0.8707,0.8769,0.8825,0.8875,0.892,0.8961,0.8998,0.9032,0.9062,0.909,0.9116,0.914,0.9162,0.9182,0.92,0.9218,0.9234,0.9249,0.9263,0.9276,0.9288,0.9299,0.931],[0.3142,0.3175,0.339,0.3717,0.4129,0.4619,0.5157,0.5696,0.6194,0.663,0.7002,0.7316,0.7579,0.7801,0.7988,0.8148,0.8285,0.8404,0.8506,0.8596,0.8675,0.8744,0.8806,0.8861,0.891,0.8954,0.8994,0.903,0.9062,0.9092,0.9119,0.9144,0.9167,0.9188,0.9207,0.9225,0.9241,0.9256,0.9271,0.9284,0.9296,0.9308,0.9319,0.9329,0.9338],[0.3507,0.354,0.3792,0.4171,0.4632,0.5152,0.5687,0.6193,0.6642,0.7027,0.735,0.762,0.7847,0.8037,0.8199,0.8336,0.8454,0.8556,0.8645,0.8722,0.879,0.885,0.8904,0.8951,0.8994,0.9032,0.9067,0.9098,0.9126,0.9152,0.9175,0.9197,0.9217,0.9235,0.9252,0.9267,0.9282,0.9295,0.9307,0.9319,0.933,0.934,0.9349,0.9358,0.9366],[0.3961,0.399,0.4283,0.4713,0.521,0.5735,0.6242,0.6697,0.7088,0.7416,0.769,0.7918,0.8109,0.8269,0.8405,0.8521,0.8621,0.8707,0.8782,0.8847,0.8905,0.8956,0.9001,0.9041,0.9077,0.911,0.9139,0.9166,0.919,0.9212,0.9232,0.925,0.9267,0.9282,0.9297,0.931,0.9322,0.9333,0.9344,0.9354,0.9363,0.9372,0.938,0.9387,0.9394],[0.4536,0.455,0.4881,0.5352,0.586,0.6358,0.681,0.72,0.7527,0.7799,0.8023,0.821,0.8366,0.8497,0.8608,0.8703,0.8785,0.8855,0.8917,0.8971,0.9018,0.906,0.9097,0.913,0.916,0.9187,0.9211,0.9233,0.9253,0.9271,0.9287,0.9303,0.9317,0.9329,0.9341,0.9352,0.9362,0.9372,0.938,0.9389,0.9396,0.9403,0.941,0.9416,0.9422],[0.5276,0.5251,0.5607,0.6089,0.6567,0.7005,0.7383,0.7698,0.7958,0.8172,0.8349,0.8495,0.8617,0.872,0.8807,0.8882,0.8946,0.9002,0.905,0.9092,0.913,0.9163,0.9192,0.9218,0.9242,0.9263,0.9282,0.93,0.9315,0.933,0.9343,0.9355,0.9366,0.9376,0.9386,0.9394,0.9402,0.941,0.9417,0.9423,0.9429,0.9435,0.944,0.9445,0.945],[0.6238,0.6127,0.6466,0.691,0.7315,0.7663,0.7952,0.8188,0.838,0.8538,0.8667,0.8774,0.8864,0.8939,0.9003,0.9058,0.9105,0.9146,0.9182,0.9213,0.924,0.9265,0.9287,0.9306,0.9323,0.9339,0.9353,0.9366,0.9378,0.9388,0.9398,0.9407,0.9415,0.9423,0.943,0.9436,0.9442,0.9448,0.9453,0.9458,0.9462,0.9466,0.947,0.9474,0.9477],[0.7477,0.7194,0.7448,0.7791,0.8082,0.832,0.8512,0.8667,0.8792,0.8894,0.8978,0.9047,0.9105,0.9154,0.9196,0.9231,0.9262,0.9288,0.9312,0.9332,0.935,0.9366,0.938,0.9393,0.9404,0.9414,0.9424,0.9432,0.944,0.9447,0.9453,0.9459,0.9464,0.9469,0.9474,0.9478,0.9482,0.9485,0.9489,0.9492,0.9495,0.9498,0.95,0.9503,0.9505],[0.9014,0.844,0.852,0.8704,0.8852,0.8969,0.9061,0.9135,0.9194,0.9242,0.9282,0.9315,0.9342,0.9365,0.9385,0.9402,0.9416,0.9429,0.944,0.945,0.9458,0.9466,0.9473,0.9479,0.9484,0.9489,0.9494,0.9498,0.9501,0.9505,0.9508,0.951,0.9513,0.9515,0.9517,0.952,0.9521,0.9523,0.9525,0.9526,0.9528,0.9529,0.953,0.9531,0.9532]],"blank":false},{"name":"5","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[0.2907,0.2942,0.3184,0.3509,0.3929,0.4446,0.5031,0.563,0.619,0.6681,0.7099,0.7448,0.7741,0.7986,0.8193,0.8369,0.8519,0.8649,0.8761,0.8858,0.8944,0.902,0.9087,0.9146,0.92,0.9247,0.929,0.9329,0.9365,0.9397,0.9426,0.9453,0.9478,0.95,0.9521,0.954,0.9558,0.9575,0.959,0.9604,0.9618,0.963,0.9642,0.9652,0.9663],[0.3219,0.3257,0.3543,0.3922,0.4399,0.4958,0.5553,0.6126,0.6639,0.7077,0.7444,0.775,0.8005,0.8219,0.84,0.8553,0.8685,0.8798,0.8896,0.8982,0.9057,0.9123,0.9182,0.9234,0.9281,0.9323,0.9361,0.9396,0.9427,0.9455,0.9481,0.9505,0.9526,0.9546,0.9565,0.9582,0.9597,0.9612,0.9625,0.9638,0.965,0.9661,0.9671,0.9681,0.969],[0.3602,0.364,0.3978,0.4416,0.4944,0.5525,0.6102,0.6629,0.7084,0.7466,0.7783,0.8045,0.8264,0.8448,0.8603,0.8735,0.8848,0.8945,0.903,0.9103,0.9168,0.9226,0.9276,0.9322,0.9362,0.9399,0.9432,0.9461,0.9488,0.9513,0.9535,0.9556,0.9575,0.9592,0.9608,0.9623,0.9636,0.9649,0.9661,0.9672,0.9682,0.9692,0.9701,0.9709,0.9717],[0.4081,0.4114,0.451,0.5003,0.5563,0.6135,0.6668,0.7133,0.7524,0.7847,0.8114,0.8334,0.8518,0.8672,0.8802,0.8913,0.9008,0.909,0.9161,0.9224,0.9279,0.9327,0.937,0.9408,0.9443,0.9474,0.9501,0.9527,0.955,0.957,0.9589,0.9607,0.9623,0.9638,0.9651,0.9664,0.9675,0.9686,0.9696,0.9705,0.9714,0.9722,0.973,0.9737,0.9744],[0.4689,0.4705,0.5158,0.5689,0.6247,0.6775,0.724,0.7632,0.7955,0.822,0.8437,0.8617,0.8766,0.8892,0.8998,0.9089,0.9166,0.9233,0.9292,0.9343,0.9388,0.9428,0.9463,0.9494,0.9523,0.9548,0.9571,0.9592,0.961,0.9628,0.9643,0.9658,0.9671,0.9683,0.9694,0.9705,0.9714,0.9723,0.9731,0.9739,0.9746,0.9753,0.9759,0.9765,0.9771],[0.5475,0.5446,0.5937,0.6468,0.6979,0.7431,0.7811,0.8123,0.8377,0.8584,0.8753,0.8893,0.901,0.9108,0.9191,0.9261,0.9322,0.9375,0.942,0.946,0.9496,0.9527,0.9555,0.958,0.9602,0.9622,0.964,0.9656,0.9671,0.9684,0.9697,0.9708,0.9719,0.9728,0.9737,0.9745,0.9753,0.976,0.9766,0.9772,0.9778,0.9783,0.9788,0.9793,0.9797],[0.6495,0.6367,0.6848,0.7321,0.7739,0.8089,0.8374,0.8604,0.8789,0.8939,0.9062,0.9164,0.9249,0.932,0.938,0.9432,0.9476,0.9514,0.9548,0.9577,0.9603,0.9626,0.9646,0.9664,0.968,0.9695,0.9708,0.972,0.9731,0.9741,0.975,0.9758,0.9766,0.9773,0.978,0.9786,0.9791,0.9796,0.9801,0.9806,0.981,0.9814,0.9817,0.9821,0.9824],[0.7803,0.748,0.7871,0.8221,0.851,0.8742,0.8926,0.9073,0.9191,0.9286,0.9365,0.9429,0.9483,0.9528,0.9566,0.9599,0.9627,0.9652,0.9673,0.9692,0.9709,0.9723,0.9736,0.9748,0.9758,0.9768,0.9776,0.9784,0.9791,0.9797,0.9803,0.9809,0.9813,0.9818,0.9822,0.9826,0.983,0.9833,0.9836,0.9839,0.9842,0.9844,0.9846,0.9849,0.9851],[0.9404,0.8763,0.8968,0.9141,0.9276,0.9382,0.9465,0.953,0.9583,0.9625,0.966,0.9689,0.9713,0.9733,0.975,0.9764,0.9777,0.9788,0.9798,0.9806,0.9813,0.982,0.9826,0.9831,0.9836,0.984,0.9844,0.9847,0.985,0.9853,0.9856,0.9858,0.9861,0.9863,0.9864,0.9866,0.9868,0.9869,0.9871,0.9872,0.9873,0.9874,0.9875,0.9876,0.9877]],"blank":false},{"name":"6","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800],"v":[[0.3056,0.3379,0.3949,0.4781,0.5862,0.7013,0.8031,0.8849,0.949,0.9991,1.0388,1.0707,1.0967,1.1181,1.1359,1.1509,1.1637,1.1746,1.1841,1.1923,1.1995,1.2058,1.2114,1.2164,1.2209,1.2248,1.2284,1.2317,1.2346],[0.3401,0.379,0.4474,0.5431,0.657,0.7671,0.859,0.9312,0.9874,1.0314,1.0662,1.0942,1.1171,1.136,1.1517,1.165,1.1763,1.186,1.1944,1.2017,1.2081,1.2137,1.2187,1.2232,1.2271,1.2307,1.2339,1.2368,1.2394],[0.3828,0.43,0.5115,0.6178,0.7318,0.8328,0.9137,0.9764,1.0249,1.0629,1.0931,1.1174,1.1372,1.1537,1.1674,1.179,1.1889,1.1973,1.2047,1.2111,1.2167,1.2216,1.226,1.2299,1.2334,1.2365,1.2393,1.2418,1.2442],[0.4366,0.4938,0.5886,0.7008,0.8085,0.8977,0.967,1.0203,1.0614,1.0937,1.1194,1.1401,1.1571,1.1711,1.1829,1.1928,1.2013,1.2086,1.2149,1.2204,1.2252,1.2294,1.2332,1.2366,1.2396,1.2423,1.2447,1.2469,1.2489],[0.5056,0.5737,0.679,0.7894,0.8855,0.9612,1.0189,1.063,1.0971,1.1239,1.1452,1.1625,1.1766,1.1883,1.1981,1.2065,1.2136,1.2197,1.225,1.2296,1.2337,1.2372,1.2404,1.2432,1.2457,1.248,1.2501,1.2519,1.2536],[0.5952,0.6723,0.7807,0.8809,0.9616,1.023,1.0694,1.1046,1.1319,1.1534,1.1705,1.1844,1.1958,1.2053,1.2133,1.22,1.2258,1.2307,1.235,1.2388,1.2421,1.245,1.2475,1.2498,1.2519,1.2537,1.2554,1.2569,1.2583],[0.7111,0.7899,0.8901,0.9729,1.036,1.0831,1.1184,1.1452,1.166,1.1823,1.1954,1.2061,1.2148,1.2221,1.2282,1.2334,1.2378,1.2416,1.245,1.2479,1.2504,1.2527,1.2546,1.2564,1.258,1.2594,1.2607,1.2619,1.263],[0.8569,0.9227,1.0028,1.0637,1.1084,1.1414,1.166,1.1847,1.1993,1.2107,1.2199,1.2274,1.2335,1.2387,1.243,1.2467,1.2498,1.2525,1.2548,1.2569,1.2587,1.2603,1.2617,1.263,1.2641,1.2651,1.266,1.2669,1.2676],[1.0295,1.0644,1.1155,1.1522,1.1786,1.1979,1.2123,1.2233,1.2318,1.2385,1.244,1.2484,1.252,1.2551,1.2576,1.2598,1.2616,1.2633,1.2647,1.2659,1.2669,1.2679,1.2687,1.2695,1.2702,1.2708,1.2713,1.2718,1.2723]],"blank":false},{"name":"7","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800],"v":[[0.3124,0.3544,0.4216,0.5195,0.6422,0.7642,0.8665,0.9464,1.0081,1.0562,1.0941,1.1245,1.1493,1.1697,1.1866,1.2009,1.2131,1.2235,1.2326,1.2404,1.2472,1.2533,1.2586,1.2634,1.2676,1.2714,1.2749,1.278,1.2808],[0.3485,0.3995,0.48,0.591,0.7163,0.83,0.921,0.9911,1.0451,1.0871,1.1204,1.1471,1.1689,1.1869,1.2019,1.2145,1.2253,1.2345,1.2425,1.2495,1.2556,1.2609,1.2657,1.2699,1.2737,1.2771,1.2801,1.2829,1.2854],[0.3933,0.4556,0.5509,0.6713,0.7928,0.8949,0.9741,1.0346,1.0812,1.1175,1.1462,1.1694,1.1883,1.2039,1.217,1.228,1.2374,1.2454,1.2524,1.2585,1.2638,1.2685,1.2727,1.2764,1.2797,1.2827,1.2853,1.2878,1.29],[0.45,0.5259,0.6351,0.7583,0.8698,0.9584,1.0258,1.077,1.1164,1.1471,1.1716,1.1913,1.2074,1.2207,1.2319,1.2413,1.2493,1.2563,1.2622,1.2675,1.272,1.2761,1.2797,1.2828,1.2857,1.2882,1.2906,1.2926,1.2945],[0.523,0.6136,0.7319,0.8491,0.9462,1.0203,1.0761,1.1183,1.1508,1.1762,1.1964,1.2128,1.2262,1.2373,1.2466,1.2545,1.2612,1.267,1.272,1.2764,1.2802,1.2836,1.2866,1.2893,1.2917,1.2938,1.2957,1.2975,1.2991],[0.6178,0.7205,0.8382,0.9412,1.021,1.0805,1.1249,1.1585,1.1844,1.2047,1.2209,1.234,1.2448,1.2537,1.2612,1.2675,1.273,1.2776,1.2817,1.2852,1.2883,1.2911,1.2935,1.2957,1.2976,1.2993,1.3009,1.3023,1.3036],[0.7401,0.8452,0.9499,1.0325,1.0938,1.1388,1.1723,1.1977,1.2172,1.2326,1.2449,1.2549,1.2631,1.2699,1.2756,1.2805,1.2846,1.2882,1.2913,1.294,1.2964,1.2985,1.3004,1.302,1.3035,1.3048,1.3061,1.3071,1.3081],[0.8922,0.9827,1.0629,1.1219,1.1644,1.1954,1.2185,1.2359,1.2494,1.26,1.2686,1.2755,1.2812,1.2859,1.2899,1.2933,1.2962,1.2987,1.3008,1.3027,1.3044,1.3059,1.3072,1.3083,1.3094,1.3103,1.3112,1.3119,1.3126],[1.0694,1.1262,1.1746,1.2086,1.2328,1.2503,1.2633,1.2732,1.2809,1.287,1.2918,1.2958,1.299,1.3018,1.304,1.306,1.3076,1.3091,1.3103,1.3114,1.3124,1.3132,1.314,1.3147,1.3153,1.3158,1.3163,1.3167,1.3171]],"blank":false},{"name":"8","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[0.2644,0.2657,0.2673,0.2691,0.2712,0.2735,0.2761,0.2788,0.2817,0.2847,0.2933,0.3109,0.3296,0.3488,0.368,0.3867,0.4046,0.4213,0.4368,0.4511,0.464,0.4758,0.4865,0.4962,0.505,0.513,0.5202,0.5269,0.5329,0.4677,0.4725,0.477,0.4811,0.4849,0.4884,0.4917,0.4947,0.4976,0.5002,0.5027,0.505,0.5071,0.5092,0.5111,0.5129],[0.2813,0.2826,0.2841,0.2859,0.2879,0.2901,0.2925,0.2951,0.2977,0.3005,0.3092,0.3274,0.3462,0.3653,0.3842,0.4023,0.4194,0.4352,0.4498,0.4631,0.4753,0.4862,0.4962,0.5052,0.5134,0.5208,0.5276,0.5337,0.5393,0.4743,0.4788,0.4829,0.4867,0.4902,0.4934,0.4964,0.4993,0.5019,0.5043,0.5066,0.5087,0.5107,0.5126,0.5143,0.516],[0.3004,0.3016,0.303,0.3047,0.3065,0.3085,0.3106,0.3128,0.3152,0.3175,0.3262,0.3447,0.3636,0.3824,0.4007,0.418,0.4342,0.4491,0.4627,0.4752,0.4864,0.4966,0.5058,0.5141,0.5217,0.5286,0.5348,0.5405,0.5457,0.4809,0.485,0.4887,0.4922,0.4954,0.4984,0.5012,0.5037,0.5061,0.5084,0.5105,0.5124,0.5142,0.516,0.5176,0.5191],[0.3222,0.3232,0.3244,0.3257,0.3272,0.3288,0.3305,0.3322,0.334,0.3358,0.3443,0.3629,0.3816,0.3999,0.4174,0.4338,0.449,0.4629,0.4756,0.4871,0.4975,0.5068,0.5153,0.523,0.5299,0.5363,0.542,0.5472,0.552,0.4874,0.4911,0.4945,0.4977,0.5006,0.5033,0.5058,0.5082,0.5104,0.5124,0.5143,0.5161,0.5178,0.5193,0.5208,0.5222],[0.3472,0.3478,0.3486,0.3494,0.3503,0.3513,0.3523,0.3533,0.3543,0.3554,0.3634,0.3819,0.4001,0.4177,0.4343,0.4497,0.4638,0.4767,0.4883,0.4989,0.5084,0.517,0.5247,0.5318,0.5381,0.5439,0.5491,0.5539,0.5583,0.4938,0.4972,0.5003,0.5031,0.5058,0.5082,0.5105,0.5126,0.5146,0.5164,0.5181,0.5197,0.5213,0.5227,0.524,0.5252],[0.3761,0.3761,0.3761,0.3761,0.3761,0.3761,0.3761,0.3761,0.3761,0.3761,0.3835,0.4016,0.4191,0.4357,0.4512,0.4655,0.4785,0.4903,0.501,0.5106,0.5192,0.527,0.5341,0.5404,0.5462,0.5514,0.5562,0.5605,0.5645,0.5002,0.5032,0.506,0.5085,0.5109,0.5131,0.5151,0.517,0.5188,0.5204,0.5219,0.5234,0.5247,0.526,0.5272,0.5283],[0.4098,0.4088,0.4075,0.4062,0.4048,0.4034,0.402,0.4007,0.3993,0.398,0.4045,0.4219,0.4385,0.454,0.4683,0.4814,0.4932,0.5039,0.5135,0.5222,0.53,0.537,0.5433,0.549,0.5542,0.5589,0.5632,0.5671,0.5706,0.5066,0.5092,0.5116,0.5139,0.516,0.5179,0.5197,0.5214,0.5229,0.5244,0.5257,0.527,0.5282,0.5293,0.5304,0.5313],[0.4495,0.4466,0.4435,0.4401,0.4367,0.4334,0.4301,0.4269,0.4239,0.421,0.4263,0.4427,0.4581,0.4723,0.4854,0.4972,0.5078,0.5174,0.526,0.5337,0.5406,0.5468,0.5525,0.5575,0.5621,0.5663,0.5701,0.5736,0.5767,0.5129,0.5151,0.5173,0.5192,0.521,0.5227,0.5242,0.5257,0.5271,0.5283,0.5295,0.5306,0.5316,0.5326,0.5335,0.5344],[0.4964,0.4906,0.4844,0.4781,0.4719,0.4659,0.4602,0.4547,0.4496,0.4449,0.4487,0.4639,0.4779,0.4907,0.5024,0.5129,0.5223,0.5307,0.5383,0.545,0.5511,0.5566,0.5615,0.566,0.57,0.5737,0.577,0.58,0.5828,0.5191,0.521,0.5228,0.5245,0.526,0.5274,0.5288,0.53,0.5312,0.5322,0.5332,0.5342,0.5351,0.5359,0.5367,0.5374]],"blank":false},{"name":"9","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[0.2449,0.2458,0.247,0.2483,0.2499,0.2516,0.2535,0.2556,0.2578,0.2627,0.2739,0.2859,0.2987,0.3121,0.3257,0.3393,0.3527,0.3657,0.378,0.3897,0.4006,0.4107,0.4201,0.4287,0.4366,0.4439,0.4507,0.4568,0.4625,0.4677,0.4725,0.477,0.4811,0.4849,0.4884,0.4917,0.4947,0.4976,0.5002,0.5027,0.505,0.5071,0.5092,0.5111,0.5129],[0.2592,0.2601,0.2613,0.2626,0.2641,0.2658,0.2676,0.2696,0.2716,0.2767,0.2883,0.3007,0.3138,0.3271,0.3406,0.3539,0.3669,0.3793,0.391,0.402,0.4122,0.4216,0.4303,0.4383,0.4457,0.4524,0.4586,0.4643,0.4695,0.4743,0.4788,0.4829,0.4867,0.4902,0.4934,0.4964,0.4993,0.5019,0.5043,0.5066,0.5087,0.5107,0.5126,0.5143,0.516],[0.2753,0.2762,0.2772,0.2785,0.2799,0.2814,0.2831,0.2849,0.2867,0.2918,0.3038,0.3164,0.3295,0.3428,0.356,0.3689,0.3813,0.393,0.404,0.4142,0.4237,0.4324,0.4405,0.4478,0.4546,0.4608,0.4665,0.4717,0.4765,0.4809,0.485,0.4887,0.4922,0.4954,0.4984,0.5012,0.5037,0.5061,0.5084,0.5105,0.5124,0.5142,0.516,0.5176,0.5191],[0.2934,0.2942,0.2951,0.2962,0.2974,0.2987,0.3001,0.3016,0.3031,0.308,0.3203,0.3331,0.3461,0.3591,0.3718,0.3841,0.3958,0.4068,0.417,0.4265,0.4352,0.4432,0.4505,0.4573,0.4634,0.4691,0.4743,0.479,0.4834,0.4874,0.4911,0.4945,0.4977,0.5006,0.5033,0.5058,0.5082,0.5104,0.5124,0.5143,0.5161,0.5178,0.5193,0.5208,0.5222],[0.314,0.3145,0.3152,0.316,0.3169,0.3178,0.3188,0.3198,0.3208,0.3255,0.3379,0.3506,0.3634,0.3759,0.388,0.3996,0.4105,0.4206,0.43,0.4387,0.4466,0.4539,0.4605,0.4666,0.4722,0.4773,0.482,0.4863,0.4902,0.4938,0.4972,0.5003,0.5031,0.5058,0.5082,0.5105,0.5126,0.5146,0.5164,0.5181,0.5197,0.5213,0.5227,0.524,0.5252],[0.3375,0.3377,0.338,0.3383,0.3386,0.3389,0.3393,0.3396,0.34,0.3442,0.3565,0.369,0.3812,0.3931,0.4045,0.4152,0.4252,0.4345,0.443,0.4508,0.458,0.4645,0.4705,0.4759,0.4809,0.4855,0.4896,0.4935,0.497,0.5002,0.5032,0.506,0.5085,0.5109,0.5131,0.5151,0.517,0.5188,0.5204,0.5219,0.5234,0.5247,0.526,0.5272,0.5283],[0.3646,0.3642,0.3638,0.3633,0.3628,0.3623,0.3617,0.3612,0.3606,0.3641,0.3762,0.3881,0.3997,0.4107,0.4212,0.431,0.44,0.4483,0.4559,0.4629,0.4692,0.475,0.4803,0.4851,0.4895,0.4935,0.4972,0.5006,0.5037,0.5066,0.5092,0.5116,0.5139,0.516,0.5179,0.5197,0.5214,0.5229,0.5244,0.5257,0.527,0.5282,0.5293,0.5304,0.5313],[0.3961,0.3947,0.3932,0.3916,0.3898,0.388,0.3862,0.3844,0.3827,0.3853,0.3967,0.4079,0.4186,0.4286,0.438,0.4468,0.4548,0.4621,0.4688,0.4749,0.4804,0.4854,0.49,0.4942,0.498,0.5015,0.5047,0.5077,0.5104,0.5129,0.5151,0.5173,0.5192,0.521,0.5227,0.5242,0.5257,0.5271,0.5283,0.5295,0.5306,0.5316,0.5326,0.5335,0.5344],[0.4329,0.43,0.4268,0.4234,0.4199,0.4163,0.4128,0.4094,0.4061,0.4075,0.4181,0.4282,0.4378,0.4468,0.455,0.4626,0.4695,0.4758,0.4815,0.4867,0.4915,0.4958,0.4997,0.5033,0.5065,0.5095,0.5122,0.5147,0.517,0.5191,0.521,0.5228,0.5245,0.526,0.5274,0.5288,0.53,0.5312,0.5322,0.5332,0.5342,0.5351,0.5359,0.5367,0.5374]],"blank":false},{"name":"10","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[0.2588,0.2605,0.2627,0.2652,0.268,0.2712,0.2746,0.2784,0.2824,0.2866,0.2909,0.2954,0.3024,0.3171,0.3321,0.3469,0.3615,0.3754,0.3885,0.4008,0.4122,0.4228,0.4324,0.4413,0.4494,0.4569,0.4637,0.4699,0.4756,0.4809,0.4857,0.4902,0.4943,0.4981,0.5016,0.5049,0.5079,0.5108,0.5134,0.5158,0.5181,0.5203,0.5223,0.5242,0.5259],[0.2755,0.2773,0.2795,0.282,0.2849,0.288,0.2914,0.2951,0.2989,0.303,0.3071,0.3112,0.318,0.3328,0.3475,0.362,0.376,0.3892,0.4017,0.4132,0.4239,0.4336,0.4426,0.4508,0.4583,0.4652,0.4715,0.4773,0.4825,0.4874,0.4919,0.496,0.4998,0.5033,0.5065,0.5096,0.5124,0.515,0.5174,0.5197,0.5218,0.5238,0.5256,0.5274,0.529],[0.2945,0.2963,0.2984,0.3009,0.3037,0.3067,0.3099,0.3134,0.3169,0.3206,0.3243,0.328,0.3345,0.3491,0.3635,0.3774,0.3907,0.4032,0.4148,0.4256,0.4354,0.4445,0.4527,0.4603,0.4672,0.4735,0.4793,0.4845,0.4894,0.4938,0.4979,0.5017,0.5052,0.5084,0.5114,0.5142,0.5167,0.5191,0.5214,0.5234,0.5254,0.5272,0.5289,0.5305,0.532],[0.3162,0.3179,0.3199,0.3221,0.3247,0.3274,0.3303,0.3333,0.3364,0.3396,0.3427,0.3458,0.3517,0.3659,0.3798,0.393,0.4055,0.4172,0.4279,0.4379,0.4469,0.4552,0.4628,0.4697,0.476,0.4817,0.487,0.4918,0.4962,0.5002,0.504,0.5074,0.5106,0.5135,0.5162,0.5188,0.5211,0.5233,0.5253,0.5272,0.529,0.5306,0.5322,0.5337,0.535],[0.3411,0.3425,0.3442,0.3461,0.3482,0.3504,0.3527,0.355,0.3574,0.3598,0.3621,0.3644,0.3695,0.3832,0.3964,0.4088,0.4204,0.4312,0.441,0.4501,0.4583,0.4659,0.4727,0.4789,0.4846,0.4898,0.4946,0.4989,0.5029,0.5066,0.5099,0.513,0.5159,0.5186,0.521,0.5233,0.5254,0.5274,0.5292,0.531,0.5326,0.5341,0.5355,0.5368,0.538],[0.37,0.3709,0.372,0.3732,0.3745,0.3758,0.3772,0.3785,0.3799,0.3812,0.3825,0.3837,0.388,0.401,0.4132,0.4247,0.4354,0.4451,0.4541,0.4622,0.4697,0.4764,0.4825,0.4881,0.4932,0.4979,0.5021,0.506,0.5096,0.5129,0.5159,0.5186,0.5212,0.5236,0.5258,0.5278,0.5297,0.5315,0.5331,0.5347,0.5361,0.5375,0.5387,0.5399,0.541],[0.4038,0.4038,0.4038,0.4038,0.4038,0.4038,0.4038,0.4038,0.4038,0.4038,0.4038,0.4038,0.407,0.419,0.4303,0.4407,0.4503,0.4591,0.467,0.4743,0.4809,0.4869,0.4923,0.4972,0.5017,0.5059,0.5096,0.513,0.5162,0.5191,0.5217,0.5242,0.5265,0.5286,0.5305,0.5323,0.534,0.5356,0.537,0.5384,0.5396,0.5408,0.542,0.543,0.544],[0.4437,0.4421,0.4403,0.4384,0.4364,0.4345,0.4326,0.4308,0.4291,0.4274,0.4259,0.4245,0.4264,0.4373,0.4474,0.4567,0.4652,0.4729,0.4799,0.4862,0.492,0.4972,0.502,0.5063,0.5102,0.5138,0.517,0.52,0.5227,0.5253,0.5276,0.5297,0.5317,0.5335,0.5352,0.5368,0.5382,0.5396,0.5409,0.5421,0.5432,0.5442,0.5452,0.5461,0.547],[0.491,0.4867,0.482,0.4772,0.4724,0.4679,0.4635,0.4594,0.4555,0.452,0.4486,0.4456,0.446,0.4557,0.4646,0.4727,0.48,0.4866,0.4927,0.4981,0.503,0.5075,0.5115,0.5152,0.5185,0.5216,0.5244,0.5269,0.5292,0.5314,0.5334,0.5352,0.5369,0.5384,0.5399,0.5412,0.5425,0.5436,0.5447,0.5457,0.5467,0.5475,0.5484,0.5492,0.5499]],"blank":false},{"name":"11","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800],"v":[[0.2654,0.2672,0.2694,0.272,0.2749,0.2782,0.2818,0.2856,0.2897,0.2939,0.2993,0.3176,0.3368,0.3564,0.3756,0.3942,0.4118,0.4281,0.443,0.4567,0.4691,0.4803,0.4904,0.4996,0.508,0.5155,0.5224,0.5286,0.5343],[0.2835,0.2854,0.2876,0.2902,0.2931,0.2963,0.2998,0.3035,0.3073,0.3113,0.3164,0.3352,0.3545,0.3737,0.3925,0.4103,0.4269,0.4422,0.4562,0.4689,0.4804,0.4908,0.5002,0.5087,0.5164,0.5234,0.5297,0.5355,0.5408],[0.3042,0.306,0.3082,0.3107,0.3134,0.3165,0.3197,0.323,0.3265,0.3301,0.3347,0.3537,0.3728,0.3916,0.4095,0.4264,0.442,0.4563,0.4693,0.481,0.4916,0.5012,0.5099,0.5177,0.5248,0.5312,0.537,0.5423,0.5472],[0.3281,0.3297,0.3316,0.3338,0.3362,0.3388,0.3416,0.3444,0.3473,0.3501,0.3541,0.373,0.3917,0.4097,0.4268,0.4426,0.4571,0.4703,0.4823,0.4931,0.5028,0.5115,0.5194,0.5266,0.533,0.5389,0.5442,0.5491,0.5535],[0.3557,0.3569,0.3584,0.3601,0.3618,0.3637,0.3656,0.3676,0.3695,0.3715,0.3745,0.3931,0.4111,0.4282,0.4442,0.4588,0.4722,0.4843,0.4952,0.505,0.5138,0.5217,0.5289,0.5354,0.5412,0.5465,0.5514,0.5558,0.5598],[0.388,0.3885,0.3891,0.3898,0.3905,0.3912,0.3919,0.3926,0.3933,0.394,0.3959,0.4138,0.4309,0.4469,0.4616,0.475,0.4871,0.4981,0.5079,0.5168,0.5247,0.5318,0.5383,0.5441,0.5493,0.5541,0.5584,0.5624,0.566],[0.4262,0.4253,0.4244,0.4235,0.4225,0.4215,0.4205,0.4195,0.4186,0.4177,0.4182,0.4351,0.4509,0.4656,0.479,0.4911,0.502,0.5118,0.5206,0.5284,0.5355,0.5418,0.5475,0.5527,0.5574,0.5616,0.5655,0.569,0.5722],[0.4715,0.4684,0.465,0.4614,0.4579,0.4545,0.4512,0.448,0.4451,0.4423,0.4411,0.4567,0.4712,0.4844,0.4964,0.5071,0.5167,0.5253,0.5331,0.54,0.5461,0.5517,0.5567,0.5612,0.5653,0.569,0.5724,0.5755,0.5783],[0.5258,0.5187,0.5113,0.504,0.4969,0.4901,0.4839,0.478,0.4727,0.4677,0.4646,0.4787,0.4916,0.5032,0.5136,0.523,0.5313,0.5388,0.5454,0.5514,0.5567,0.5615,0.5658,0.5697,0.5732,0.5764,0.5793,0.5819,0.5844]],"blank":false},{"name":"12","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]],"blank":true},{"name":"13","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]],"blank":true},{"name":"14","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]],"blank":true},{"name":"15","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]],"blank":true},{"name":"16","temps":[-40,-30,-20,-10,0,10,20,30,40],"cols":[100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],"v":[[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]],"blank":true}];
+var FORMULA_IMG = {1:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATsAAAAsCAYAAAAaeB9QAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAA64SURBVHhe7Z3Pa+T0/8ef+71nWvXabiHFi+2yu2h6qLtiQUlBcEFhSamHBZfW9LhFWqY3YWVG0cvSOuNJocuEXmQX6kzpodo2EVpFSyfgxYGa3MR1k/0D3p/LvPNN3pNkkplMO23fDwhs3+9kNvPK+/3K69f7PVcIIQQcDodzwfk/toHD4XAuIlzZcTicSwFXdpcITdNQLBZRq9UwMTGBhYUF9hQO58JyhcfsLg+jo6NYXV3F9PQ0bNvG8PAwKpUKFEVhT+VwLhzcsrtE/PPPPzg6OgIADA0NAQBOTk6YszhZUKvVUCwWUS6X2a62dHMtJxqu7C4RrutiaWkJAGDbNgBgZGSEOYvTLbZt4/vvv8fS0hKeP3+OYrHInhJJN9dy4uHKrseYpomVlRW2ORPK5TJM02SbE/Hpp59CVdUzcWFN08T09HTg6PR7nBa2bcMwDLbZo1gsYmZmBpqmBdqvX7+OnZ2dQJtt2ygWi4GDvnz8hF2raVqL7DgJIZyeUa/XiSzLxHEctisTHMchsiyTer3OdsVSqVSIqqps86mh6zqRJInouu4dvZJRVsiyTAqFAttMSPP7yLJMZFlukauqqqRarQbaCCHEsiwCgJRKJbbLI+xay7ICcuNTODlcUj3CcRwiCEJqRZQWy7KIKIrEsiy2K5RKpRKYtJVKJdB/GlDlcF4olUpEEIRIZZfP50k+n29R2JVKJVK+1WqVAGi5hhJ3rR+u7JLD3dgeMT8/j5WVFYyNjbFdmTI0NIS5uTncv3+f7WrBNE3s7u7i9u3bMAyDB8ATYNs2nj9/jsnJSbbL47fffsPVq1eRy+W8tlqtBgBQFCVUznt7e5AkKXANpd21nA5htR+ne6rVKhEEIfKt3QtEUWxrCQiCQAAEDl3X2dN6znmy7KjFFubGWpZFCoUCAUBUVfX6LcsKyJq9jhBCJEki+XyebU50rR8+hZPD6+x6wOjoKObm5rzMZxJs28bjx48DbbOzs16JSDvK5TK++OIL/PXXX2xX32EYBj777DPPgulX6P3RRMDU1FTLM6X1immmkeu6GBgYQLVa7TrBcOXKlVT/92WGu7EZo2kaGo0GZmdn2a5YhoaGMDs7i+XlZQwODmJpaSmxogOAmZkZNBqNlmwgpzNc18XTp0/bKqN6vQ5RFNnmWGhWl3WNucvaW7iyy5gnT55AkqRUiopSr9eBpuJKSy6Xg6Io+Prrr9kuTgdYloVGo+FZdYZh4Ntvv20pIzo6OsLExESgrR1h8TrXdfH3338HzuNkS1tl57ouNE3ruzoo0zShaRpc12W7zgwqq48//pjtSkTYJEjDnTt3cHh4GFqzxUnH2NgYarWad0xOTmJubg4PHz4MnPfHH3/gxo0bgbZ2bG9v44033vD+dl0Xy8vLuH37duA8TrbEKjvXdXHz5k04joPx8fG+ibGUy2UsLi7iyZMneOedd9juM+PHH38EAFy7do3tSsT29jbeffddtjkxt27dAgBsbm6yXecSwzD6YszFWXYHBwcBJWWaJmq1GmzbRrlcDryMa7UapqencXh4iK2tLc9qvHnzJtbX19u6zJz/58qVK7HHxMRE69hhMxZ+8vk8EUXRyzi1y/adBo7jePcCgIiiyJ5yZqiq2nF2jH4vtog0LYIgEEVR2Oa+Ii4bS+sAJUlKlI08KxzH8Wop/RQKBSLLMqlWq0TX9ZYi46zpdLxdBKgOYAuzHcfxxo+/2iDWstM0DRMTE5idnYWu62eytIjFbz3puo6ff/6ZPeXM+PXXXyFJEtuciKyC1pOTk+feshsZGcGDBw/Y5tQYhtGTtaWmaWJgYADFYhEfffRRoG92dhbPnj3zrLRGoxHo7zds2z63YY/j42PA59FQcrkcPvzwQ6AZGqJEKjvbttFoNHDjxg0MDQ21TMKzYnd3F2jGVCYnJztKBKDpord7yGnjlIeHh3j55ZfZ5kSExes6CVqLoogXL16wzV3RTg62bWcWO1UUBYqi4OrVq2xX3zA8PAxZlgEAhUIh0Oc4jheP29zcxL179wL9/YTrunjttdcwPDwcu+63X9ne3oYgCKGF+3Q8Dg4Oem0tys51XRiG4VkHg4ODMAyjrWLoNaZpwjAMz3oyDKPrB3T//v3IiaxpGlZXV9nmSKh8pqam2K5EZBW0pruYdCsbP6urq5ElLaZpJlq9cZHI5XKo1Wp4+PBhSzJpf38fjUYDtVrNy5D3K5ZleS9GaiWlxTRNbzODsDFCk3a0P+yl6P+MpHFa13VxeHiI9957j+2CaZp49OgRJEkKVjYEnN1m9b8sy0QURQLAW+DcbSypWxRFIbIse3E6WZa7jk1FLaTvZKE8XZSdNsZE5e3/XlT+bDwoCTS+mvXKCFVVW2K2nW50EBezo3QqTz+6rnd1fScoipJ4nXIWhEzhVFSr1ZaYV1JUVSWiKHrxSUEQAs+1Xq8TURRJqVQiuq6TUqlERFEMzLdKpUJkWfY2NlBVte3YIL61xf57tyyLVCoVIghC6FrlSEkpipJ6stEbTXqkHYj1er3lC3YLq/A6UXQko8mZBTRo24uXk1/hdaroyAVWdnSZYC9kH0W3yq5T6EvVr7gEQfAShjR5w8q/UCgEllJKktQyn9uNDdJMngIg+XyeFAoF75AkiSiK0mLAkLjlYqOjo3j11VcTmZSnhaZpmJmZga7rmcYQXdfF3bt3MTU1hZOTE6ytrbGntMUwDLz55psoFAotS4pOk17fx8LCAkZGRrCzs4ONjY0WNy4JRoLlYmm/R5jbfnx8jKOjo5YkAgCMj493dO/9RprlYmEyiiNORqOjo3jllVdwcHDgtdm2jVwuh1wuh3K5jE8++aRlrtLnWiqVMD8/75X1fPnll7h27RomJydh23bbWPzExAT+/PPPULeYfuYvv/wSjOex2o/S7Vu1F9C3SS+g2/iEvRGSkMYSAbMYP83RjjT30Qn1ep0IgtDyNk5D1padZVktXoMsy0SSpEBowH+0s75YuZ/1EUVcn58oGcUdcTJCM8QVhdwMzbDhFPpc6bV0PNHvKQhCS7iEhZZpRYWxqJ5gx06opOgNxX3ZMOr1uud7JznSKha5OYBZLMvy4iT+fyeFuq6sS5uGNJOzl9D76EYZReF3XcNieEnRM1Z2Uein7MZ2Qrf3l1TZZU07ZacoSqyyYxUVfVY0VxA3h8PidX6oi8vKtiUbC19mZnx8nO2KZX9/H3t7e4kPy7LYj4jFMIxAxhK+3UI++OADrKysYH9/H59//nloZigMTdOwu7uLtbU15HI5bGxsYHFxMTJLmzXs9txpXQ0WWlfU6SqOKEzTxOLioue6rq2tYXd3N7GcLyJ2c6v2sLFiJ9h63TCMluVn5wVaEcFSq9Xgui7efvtttgvwlYTcuXMHaLqcaNaHLi0t4ffffweA2JKrp0+fAiH1dWh+/qNHjyAIQutmHAHV10RV1dTJiV4TtY01zbr4A8N6MzPUjqhkRCcWXjeWiCiKLW+6TqEmPPtG7Ya4ZEQnFt5FsOyq1SopFApEj8kgRo1Z0hxjpVIp9Lo0REzhRNCVBoIgxFpSYVDryi9fOm/ov2mywI+iKAHvjGZr/YBJfLBEVSroze3+o8JRoZKSJKnrh5A1VLhhk5hmaSk0/RyHZVmhmydSqKuWhjDzvB00/pA2ZBAFVXZpB28c1MWPIp/Pp/r/4pQdvX/2iDo/jl4qO9lX+kQVMzs26ZgNk12pVAooh07pRtnReYMIhdyOarXqxUQLzWVyfiXjOI6n3ArNTCk7luizVZubn8qyHHkv1MWNOkRRJKqqRo7FUEl1+uV7SaGZsg6DfUOqqppa6WSBwNQZJSFuQnSC3AwM9zNxyi5LeqnsqtWq94Kiz5CdZPl8PjTGrDdj1iRhmUUc3T7rQqHQooDSUq/XQy0piuM4RI/4USXaZjV/SKiXeJKiWpW+pdgHdxbQDBItPIyytBRF8Qa1c0o/dBOGLMuRCjmKqAnRKf1olbOclrLr9QSik1iSpFBXXorZep0qPIRYhGnoVtldJrwExfLyMp49e4a9vT2oqtq2zuU0ePz4Mba2toBmMDefz7OnAM01iDs7O9A0DXfv3sXGxkboerleMzU1hRcvXrQEouPodlsnlsPDQ7z++uts86Wk12u6LcvC3t4eRkdH2S5vOVPYcj96XzQI71+szukhVOtRV7BbkzZLqGWnKEpkTMsfrztra5TeS9hbPoyoeJ3eQVkO8cWO2M/rN07LsjstaCLCL/eo8ETW4SFu2SXHs+zm5+dRq9W8Eox+YGhoCLVaDZVKJXJjw/39fW8HirO2RsfGxiCKorczSzto6p61PtbX172dcukGCElKPDY3NyEIQqSsONkxMzPjPT867mhJBDLcxYaTHaF1ducFTdPwww8/AM16tX5gbm4O6+vrbHMoe3t7EEUxMCHK5TJeeukl2M3fK33//fcxMDCAk5OTtgpP07TQpVGcbLFtG5qmefWoNGxx/fp175ysdrHhZAhr6nG6g7o0ca4sdc8FQfAyuHJzdQiaNUY0+E2TMoXmQuco+imx1I6L4Maqqkry+TzRdZ0oiuJl/6sJd7GhpSeVSoUnKE4JLqkekM/nM5nMpVLJU5qSJMUqMkVRIrPV/cZFUHbEl1VNG1+tVCpehQGttYt7tnFwZZecc+3G9itLS0swMthc9KeffsLx8TE0TcODBw8iY5JGc7PVqGw1pzfQrGrazP+tW7fgOA7u3bvnhTB4LO8UYLUfJxtodXk3JK2/k2OqzvuRi2LZdYPS3OTTcZyuxgmfwsnhll2PmJ6ehqIoLT+9l5RisYh///03dJG5n2KxCFEUMT8/z3Zx+piDgwNsbm7im2++CWRxOb0jcvNOTjYsLCzgrbfe6slvEfh3bDlPGIaB6enpQMnNV199ldodPK+YponV1dWOnpumafjuu++8v7e2tsCncDK4sjsFDMNoqaXLAtM0z6WCcF0X9Xo90Ba3K+5FwnVdzM/P47///utop2fbtlvie70YWxcRruw4HM6lgMfsOBzOpeB/EfyaJqTEdm4AAAAASUVORK5CYII=",2:"data:image/png;base64,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"};
+// ==== CALC BEGIN ====
+/* 度.分秒（D.MMSS）→ 十进制度 */
+function dmssToDeg(v){
+  var s = v < 0 ? -1 : 1, a = Math.abs(v);
+  var d = Math.floor(a);
+  var mh = a * 100;
+  var m = Math.floor(+(mh - d * 100).toFixed(6));
+  var sh = a * 10000;
+  var sec = +((sh - Math.floor(mh + 1e-9) * 100).toFixed(6));
+  return s * (d + m / 60 + sec / 3600);
+}
+function degToDms(deg){
+  var s = deg < 0 ? -1 : 1, a = Math.abs(deg);
+  var d = Math.floor(a);
+  var mf = (a - d) * 60;
+  var m = Math.floor(mf);
+  var sec = (mf - m) * 60;
+  sec = Math.round(sec * 100) / 100;
+  if (sec >= 60){ sec -= 60; m += 1; }
+  if (m >= 60){ m -= 60; d += 1; }
+  return { sign: s, d: d, m: m, s: sec };
+}
+function fmtDms(deg, withSign){
+  var p = degToDms(deg);
+  var secTxt = p.s < 10 ? "0" + p.s.toFixed(2) : p.s.toFixed(2);
+  var out = p.d + "°" + (p.m < 10 ? "0" + p.m : p.m) + "′" + secTxt + "″";
+  if (withSign !== false && p.sign < 0) out = "-" + out;
+  return out;
+}
+function degToDmssNum(deg){
+  var p = degToDms(deg);
+  var sec = Math.round(p.s * 100) / 10000;
+  var v = p.d + p.m / 100 + sec;
+  return deg < 0 ? -v : v;
+}
+/* 支持 "4.5726" / "4°57′26″" / "4 57 26" */
+function parseAngle(txt){
+  if (txt === null || txt === undefined) return null;
+  var s = String(txt).trim();
+  if (s === "") return null;
+  s = s.replace(/[°º]/g, "°").replace(/[′']/g, "′").replace(/[″"]/g, "″").replace(/：/g, ":");
+  var neg = s.charAt(0) === "-";
+  if (neg) s = s.substring(1);
+  var parts = s.split(/[°′″\s:]+/).filter(function(x){ return x !== ""; });
+  if (parts.length >= 3){
+    var v = (parseFloat(parts[0]) || 0) + (parseFloat(parts[1]) || 0) / 60 + (parseFloat(parts[2]) || 0) / 3600;
+    return neg ? -v : v;
+  }
+  if (parts.length === 2){
+    var v2 = (parseFloat(parts[0]) || 0) + (parseFloat(parts[1]) || 0) / 60;
+    return neg ? -v2 : v2;
+  }
+  var n = parseFloat(parts[0]);
+  if (isNaN(n)) return null;
+  return dmssToDeg(neg ? -n : n);
+}
+/* 双线性插值取系数 */
+function lookupCoef(idx, temp, lrep){
+  var tb = TABLES[idx];
+  if (!tb || !tb.v || !tb.v.length) return null;
+  var temps = tb.temps, cols = tb.cols, v = tb.v;
+  if (temp == null || lrep == null || !isFinite(temp) || !isFinite(lrep)) return null;
+  function bracket(arr, x){
+    var n = arr.length;
+    if (!n) return null;
+    if (x <= arr[0]) return { i: 0, j: 0, f: 0, clamped: x < arr[0] };
+    if (x >= arr[n - 1]) return { i: n - 1, j: n - 1, f: 0, clamped: x > arr[n - 1] };
+    for (var i = 0; i < n - 1; i++){
+      if (x >= arr[i] && x <= arr[i + 1]){
+        var span = arr[i + 1] - arr[i];
+        return { i: i, j: i + 1, f: span === 0 ? 0 : (x - arr[i]) / span, clamped: false };
+      }
+    }
+    return { i: n - 1, j: n - 1, f: 0, clamped: false };
+  }
+  var t = bracket(temps, temp), l = bracket(cols, lrep);
+  if (!t || !l) return null;
+  function cell(r, c){
+    var row = v[r];
+    if (!row) return null;
+    var x = row[c];
+    return (typeof x === "number" && isFinite(x)) ? x : null;
+  }
+  var v00 = cell(t.i, l.i), v01 = cell(t.i, l.j), v10 = cell(t.j, l.i), v11 = cell(t.j, l.j);
+  if (v00 == null) v00 = v01; if (v00 == null) v00 = v10; if (v00 == null) v00 = v11;
+  if (v01 == null) v01 = v00;
+  if (v10 == null) v10 = v00;
+  if (v11 == null) v11 = v01;
+  if (v00 == null) return null;
+  var val = (v00 * (1 - t.f) + v10 * t.f) * (1 - l.f) + (v01 * (1 - t.f) + v11 * t.f) * l.f;
+  return {
+    coef: val, tIdx: [t.i, t.j], lIdx: [l.i, l.j],
+    tClamp: t.clamped, lClamp: l.clamped,
+    tSpan: [temps[t.i], temps[t.j]], lSpan: [cols[l.i], cols[l.j]],
+    tRange: [temps[0], temps[temps.length - 1]], lRange: [cols[0], cols[cols.length - 1]]
+  };
+}
+/* 弧垂公式 1 / 2 */
+function calcF(coef, cosT, lobs, lrep, formula){
+  if (formula === 1){
+    return coef * Math.pow(lobs / lrep, 2) *
+           (1 + (4 * coef * coef * lobs * lobs) / (3 * Math.pow(lrep, 4))) / cosT;
+  }
+  return coef / cosT * Math.pow(lobs / 100, 2);
+}
+/* 档端角度法 */
+function calcDy(p){
+  var out = { warn: [], steps: [] };
+  if (p.temp == null || !(p.lrep > 0) || !(p.lobs > 0) || p.h == null || p.beta == null){
+    out.empty = true; return out;
+  }
+  var fit = p.fit || 0, ih = p.ih || 0;
+  var a = p.h - ih - fit;
+  var lk = lookupCoef(p.idx, p.temp, p.lrep);
+  var name = TABLES[p.idx] ? TABLES[p.idx].name : "—";
+  if (!lk){
+    out.noData = true;
+    out.warn.push({ t: "【" + name + "】弧垂表暂无可用数据，请到「百米弧垂表」页填写", bad: true });
+    out.a = a;
+    return out;
+  }
+  var tanB = Math.tan(p.beta * Math.PI / 180);
+  var cosT = Math.cos(Math.atan(Math.abs(Math.abs(tanB * p.lobs) - a) / p.lobs));
+  if (!(cosT > 0)) cosT = 1;
+  var coef = lk.coef;
+  var f = calcF(coef, cosT, p.lobs, p.lrep, p.formula);
+  var k = 2 * Math.sqrt(f) - Math.sqrt(a);
+  var tanA = tanB - (k * k) / p.lobs;
+  var aRad = Math.atan(tanA);
+  out.a = a; out.coef = coef; out.f = f; out.cosT = cosT; out.tanB = tanB;
+  out.tanA = tanA; out.alphaRad = aRad;
+  out.alphaDeg = aRad * 57.29577951308232;
+  out.ratio = f > 0 ? a / f : null;
+  out.lk = lk; out.name = name; out.formula = p.formula;
+  if (p.formula === 1){
+    out.subst = "f = " + coef.toFixed(4) + " × (" + p.lobs + "/" + p.lrep + ")² × [1 + 4×" +
+      coef.toFixed(4) + "²×" + p.lobs + "² ÷ (3×" + p.lrep + "⁴)] ÷ " + cosT.toFixed(6) +
+      " = " + f.toFixed(3) + " m";
+  } else {
+    out.subst = "f = " + coef.toFixed(4) + " ÷ " + cosT.toFixed(6) + " × (" + p.lobs + "/100)² = " + f.toFixed(3) + " m";
+  }
+  out.steps = [
+    ["A值 a = 呼高−仪高−串长", a.toFixed(3) + " m"],
+    ["系数 C（" + name + " " + p.temp + "℃ " + p.lrep + "m）", coef.toFixed(4)],
+    ["高差角 cosθ", cosT.toFixed(6)],
+    ["观测弧垂 f", f.toFixed(3) + " m"],
+    ["tanβ", tanB.toFixed(6)],
+    ["2√f − √a", k.toFixed(4)],
+    ["tanα = tanβ − (2√f−√a)²/L", tanA.toFixed(6)],
+    ["A值/弧垂", out.ratio == null ? "—" : out.ratio.toFixed(3)]
+  ];
+  if (a <= 0) out.warn.push({ t: "A值 ≤ 0（呼高、串长、仪高组合不合理），请复核输入", bad: true });
+  if (lk.lClamp) out.warn.push({ t: "代表档距 " + p.lrep + " m 超出该表范围（" + lk.lRange[0] + "–" + lk.lRange[1] + " m），已按表边取值，结果仅供参考" });
+  if (lk.tClamp) out.warn.push({ t: "温度 " + p.temp + "℃ 超出该表范围（" + lk.tRange[0] + "–" + lk.tRange[1] + "℃），已按表边取值" });
+  if (out.ratio != null && out.ratio > 4) out.warn.push({ t: "A值/弧垂 = " + out.ratio.toFixed(2) + " > 4，原表判为“不适合观看”，建议改换观测方法或档位", bad: true });
+  if (tanA < 0) out.warn.push({ t: "tanα < 0：视线为俯角，仪器需下俯 " + fmtDms(Math.abs(out.alphaDeg)) });
+  if (p.chk != null){
+    var tanC = Math.tan(p.chk * Math.PI / 180);
+    var t1 = p.lobs * (tanB - tanC);
+    if (t1 < 0){
+      out.warn.push({ t: "检验角偏大（tanβ−tanα ≤ 0），检验弧垂无解，请复核检验角度", bad: true });
+    } else {
+      var f2 = Math.pow(Math.sqrt(t1) + Math.sqrt(a), 2) / 4;
+      out.f2 = f2; out.diff = f2 - f;
+      var tens = p.tens;
+      out.adj = (tens != null && tens !== "" && tens > 0)
+        ? (8 * p.lrep * p.lrep) / (3 * Math.pow(p.lobs, 4)) * (f2 * f2 - f * f) * tens
+        : (8 * (f2 * f2 - f * f)) / (3 * p.lobs);
+      var dbg = tanB - tanC;
+      out.steps.push(["检验弧垂 f′ 代入", "f′ = (√(" + p.lobs + "×" + dbg.toFixed(6) + ") + √" + a + ")² ÷ 4 = " + f2.toFixed(3) + " m"]);
+      out.steps.push(["弧垂差值 f′−f", (out.diff >= 0 ? "大 " : "小 ") + Math.abs(out.diff).toFixed(3) +
+        " m（" + f2.toFixed(3) + " − " + f.toFixed(3) + "）"]);
+      out.steps.push(["调整线长 ΔL", out.adj.toFixed(3) + " m"]);
+    }
+  }
+  return out;
+}
+/* 档外角度法 */
+function calcDw(p){
+  var out = { warn: [], steps: [] };
+  if (p.temp == null || !(p.lrep > 0) || !(p.l1 > 0) || !(p.lobs > 0) || p.t1 == null || p.t2 == null){
+    out.empty = true; return out;
+  }
+  var tan1 = Math.tan(p.t1 * Math.PI / 180);
+  var tan2 = Math.tan(p.t2 * Math.PI / 180);
+  var lk = lookupCoef(p.idx, p.temp, p.lrep);
+  var name = TABLES[p.idx] ? TABLES[p.idx].name : "—";
+  var a0 = tan1 * p.l1, h0 = tan2 * (p.l1 + p.lobs) - a0;
+  out.a = a0; out.h = h0; out.tan1 = tan1; out.tan2 = tan2; out.name = name; out.formula = p.formula;
+  if (!lk){
+    out.noData = true;
+    out.warn.push({ t: "【" + name + "】系数表暂无可用数据，请到「百米弧垂表」页填写", bad: true });
+    return out;
+  }
+  var coef = lk.coef;
+  var cosT = Math.cos(Math.atan(Math.abs(tan1 * p.l1 - tan2 * (p.l1 + p.lobs)) / p.lobs));
+  if (!(cosT > 0)) cosT = 1;
+  var f = calcF(coef, cosT, p.lobs, p.lrep, p.formula);
+  var a = a0;
+  var h = h0;
+  var A = (4 * f - h - 8 * f * (-p.l1) / p.lobs) * 2 / p.lobs;
+  var B = (Math.pow(4 * f - h, 2) - 16 * f * a) / (p.lobs * p.lobs);
+  var disc = Math.pow(A / 2, 2) - B;
+  out.Av = A; out.Bv = B; out.coef = coef; out.f = f; out.cosT = cosT; out.disc = disc; out.lk = lk;
+  if (p.formula === 1){
+    out.subst = "f = " + coef.toFixed(4) + " × (" + p.lobs + "/" + p.lrep + ")² × [1 + 4×" +
+      coef.toFixed(4) + "²×" + p.lobs + "² ÷ (3×" + p.lrep + "⁴)] ÷ " + cosT.toFixed(6) +
+      " = " + f.toFixed(3) + " m";
+  } else {
+    out.subst = "f = " + coef.toFixed(4) + " ÷ " + cosT.toFixed(6) + " × (" + p.lobs + "/100)² = " + f.toFixed(3) + " m";
+  }
+  out.steps = [
+    ["tan1（近端切线角）", tan1.toFixed(6)],
+    ["tan2（远端切线角）", tan2.toFixed(6)],
+    ["系数 C（" + name + " " + p.temp + "℃ " + p.lrep + "m）", coef.toFixed(4)],
+    ["高差角 cosθ", cosT.toFixed(6)],
+    ["观测弧垂 f", f.toFixed(3) + " m"],
+    ["a = tan1×临近档距", a.toFixed(3)],
+    ["h = tan2×(临近+观测) − a", h.toFixed(3)],
+    ["A", A.toFixed(4)],
+    ["B", B.toFixed(6)],
+    ["(A/2)² − B", disc.toFixed(6)]
+  ];
+  if (disc < 0){
+    out.warn.push({ t: "(A/2)²−B < 0，观测角无解，请复核切线角与档距输入", bad: true });
+    out.tanA = null;
+  } else {
+    var tanA = Math.sqrt(disc) - A / 2;
+    var aRad = Math.atan(tanA);
+    out.alphaDeg = aRad * 57.29577951308232;
+    out.tanA = tanA;
+    out.ratio = f > 0 ? (tan1 * p.l1 - tanA * p.l1) / f : null;
+    out.steps.push(["tanα", tanA.toFixed(6)]);
+    out.steps.push(["观测角", fmtDms(out.alphaDeg)]);
+    if (out.ratio != null) out.steps.push(["A值/弧垂", out.ratio.toFixed(3)]);
+    if (out.ratio != null && out.ratio > 4) out.warn.push({ t: "A值/弧垂 = " + out.ratio.toFixed(2) + " > 4，原表判为“不适合观看”", bad: true });
+    if (tanA < 0) out.warn.push({ t: "tanα < 0：视线为俯角，仪器需下俯 " + fmtDms(Math.abs(out.alphaDeg)) });
+    if (p.chk != null){
+      var tanC = Math.tan(p.chk * Math.PI / 180);
+      var s1 = (tan1 - tanC) * p.l1, s2 = (p.l1 + p.lobs) * (tan2 - tanC);
+      if (s1 < 0 || s2 < 0){
+        out.warn.push({ t: "检验角超出切线角范围，检验弧垂无解，请复核", bad: true });
+      } else {
+        var f2 = Math.pow(Math.sqrt(s1) + Math.sqrt(s2), 2) / 4;
+        out.f2 = f2; out.diff = f2 - f;
+        var tens = p.tens;
+        out.adj = (tens != null && tens !== "" && tens > 0)
+          ? (8 * p.lrep * p.lrep) / (3 * Math.pow(p.lobs, 4)) * (f2 * f2 - f * f) * tens
+          : (8 * (f2 * f2 - f * f)) / (3 * p.lobs);
+        out.steps.push(["检验弧垂 f′ 代入", "f′ = (√(" + p.l1 + "×" + (tan1 - tanC).toFixed(6) + ") + √(" +
+          (p.l1 + p.lobs) + "×" + (tan2 - tanC).toFixed(6) + "))² ÷ 4 = " + f2.toFixed(3) + " m"]);
+        out.steps.push(["弧垂差值 f′−f", (out.diff >= 0 ? "大 " : "小 ") + Math.abs(out.diff).toFixed(3) +
+          " m（" + f2.toFixed(3) + " − " + f.toFixed(3) + "）"]);
+        out.steps.push(["调整线长 ΔL", out.adj.toFixed(3) + " m"]);
+      }
+    }
+  }
+  if (lk.lClamp) out.warn.push({ t: "代表档距 " + p.lrep + " m 超出该表范围（" + lk.lRange[0] + "–" + lk.lRange[1] + " m），已按表边取值" });
+  if (lk.tClamp) out.warn.push({ t: "温度 " + p.temp + "℃ 超出该表范围（" + lk.tRange[0] + "–" + lk.tRange[1] + "℃），已按表边取值" });
+  return out;
+}
+// ==== CALC END ====
+</script>
+
+<script>
+function $(id){ return document.getElementById(id); }
+function num(id){
+  var v = $(id).value.trim();
+  if (v === "") return null;
+  var n = parseFloat(v.replace(/[^0-9.\-]/g, ""));
+  return isNaN(n) ? null : n;
+}
+function ang(id){ return parseAngle($(id).value); }
+function setK(id, t){ var e = $(id); if (e) e.textContent = t; }
+function setV(id, txt){ $(id).innerHTML = txt; }
+
+var state = { dy: {}, dw: {} };
+var LSKEY = "chidu_v7";
+
+function cloneTable(t){
+  return {
+    name: t.name,
+    temps: t.temps.slice(),
+    cols: t.cols.slice(),
+    v: t.v.map(function(r){ return r.slice(); })
+  };
+}
+function applySaved(){
+  try {
+    var s = JSON.parse(localStorage.getItem(LSKEY) || "null");
+    if (!s) return;
+    if (!s.tables || !s.tables.length){ return; }
+    if (s.v3 === 1 || s.tables.length !== ORIGINAL.length){
+      TABLES = s.tables.map(function(t){
+        return { name: t && t.name ? t.name : "表", temps: (t && t.temps) || [], cols: (t && t.cols) || [], v: (t && t.v) || [] };
+      });
+      return;
+    }
+    // 旧版存档里的表格数据不再沿用（新版系数表默认空白）
+    s.v3 = 1;
+    s.tables = TABLES;
+    localStorage.setItem(LSKEY, JSON.stringify(s));
+  } catch(e){}
+}
+/* ===== 下拉框 ===== */
+function curTbIdx(){
+  var v = $("tb_sel").value;
+  if (v === "__new") return Math.max(0, TABLES.length - 1);
+  var i = parseInt(v, 10);
+  return (isFinite(i) && i >= 0 && i < TABLES.length) ? i : 0;
+}
+/* 表里有温度/档距/数值 => 算“有内容” */
+function tbFilled(i){
+  var t = TABLES[i];
+  return !!(t && (tbHasData(t) || t.temps.length || t.cols.length));
+}
+/* 重建下拉：只列有内容的表；系数表下拉末尾加“＋ 新建一张弧垂表” */
+function refreshLabels(curOverride){
+  var filled = [], i;
+  for (i = 0; i < TABLES.length; i++) if (tbFilled(i)) filled.push(i);
+
+  ["dy_label","dw_label"].forEach(function(id){
+    var sel = $(id), cur = parseInt(sel.value, 10);
+    sel.innerHTML = "";
+    var h0 = $(id + "_hint"), ph = $(id + "_ph");
+    if (!filled.length){
+      var o0 = document.createElement("option");
+      o0.value = ""; o0.textContent = "";
+      if (h0) h0.classList.add("hide");
+      sel.classList.add("empty");
+      sel.appendChild(o0);
+      sel.value = "";
+      sel.style.display = "none";
+      if (ph) ph.style.display = "block";
+      return;
+    }
+    if (h0) h0.classList.add("hide");
+    sel.style.display = "";
+    if (ph) ph.style.display = "none";
+    sel.classList.remove("empty");
+    filled.forEach(function(k){
+      var o = document.createElement("option");
+      o.value = String(k); o.textContent = TABLES[k].name;
+      sel.appendChild(o);
+    });
+    sel.value = (isFinite(cur) && filled.indexOf(cur) >= 0) ? String(cur) : String(filled[0]);
+  });
+
+  var ts = $("tb_sel"), curT = (curOverride == null) ? parseInt(ts.value, 10) : curOverride;
+  var list = filled.slice();
+  if (isFinite(curT) && list.indexOf(curT) < 0) list.push(curT);
+  list.sort(function(a, b){ return a - b; });
+  ts.innerHTML = "";
+  list.forEach(function(k){
+    var o = document.createElement("option");
+    o.value = String(k); o.textContent = TABLES[k].name + (tbFilled(k) ? "" : "（空）");
+    ts.appendChild(o);
+  });
+  var on = document.createElement("option");
+  on.value = "__new"; on.textContent = "新建百米弧垂表";
+  ts.appendChild(on);
+  if (isFinite(curT) && list.indexOf(curT) >= 0) ts.value = String(curT);
+  else if (list.length) ts.value = String(list[0]);
+}
+function newTable(){
+  var n = 1;
+  while (TABLES.some(function(t){ return t.name === "新表" + n; })) n++;
+  TABLES.push({ name: "新表" + n, temps: [], cols: [], v: [] });
+  var idx = TABLES.length - 1;
+  refreshLabels(idx);
+  $("tb_sel").value = String(idx);
+  renderTb(); persistTables(); saveForm();
+  toast("已新建一张空的弧垂表，可以粘贴数据，或点【添加行】【添加列】自己填");
+}
+function findTable(name){
+  for (var i = 0; i < TABLES.length; i++) if (TABLES[i].name === name) return i;
+  return 0;
+}
+function initLabels(){ refreshLabels(); }
+function syncSelectText(){ refreshLabels(); }
+
+/* ===== 读输入 ===== */
+function readDy(){
+  return {
+    idx: parseInt($("dy_label").value, 10), temp: num("dy_temp"), lrep: num("dy_lrep"),
+    lobs: num("dy_lobs"), beta: ang("dy_beta"), h: num("dy_h"), fit: num("dy_fit"),
+    ih: num("dy_ih"), chk: ang("dy_chk"), tens: num("dy_tens"),
+    formula: parseInt($("fx_formula").value, 10)
+  };
+}
+function readDw(){
+  return {
+    idx: parseInt($("dw_label").value, 10), temp: num("dw_temp"), lrep: num("dw_lrep"),
+    l1: num("dw_l1"), lobs: num("dw_lobs"), t1: ang("dw_t1"), t2: ang("dw_t2"),
+    chk: ang("dw_chk"), tens: num("dw_tens"),
+    formula: parseInt($("fx_formula").value, 10)
+  };
+}
+
+/* ===== 公式展示 ===== */
+function showFormula(prefix, formula, subst, cosT){
+  var no = formula === 1 ? "公式1" : "公式2";
+  $(prefix + "_f_title").textContent = "弧垂计算公式 · " + no;
+  $(prefix + "_f_img").src = FORMULA_IMG[formula];
+  $(prefix + "_f_sym").innerHTML = formula === 1
+    ? '<b>f</b> 观测弧垂(m)；<b>f<sub>p</sub></b> 系数表系数 C；<b>L</b> 观测档距(m)；<b>L<sub>p</sub></b> 代表档距(m)；<b>cosB</b> 高差角余弦'
+    : '<b>f<sub>x</sub></b> 观测弧垂(m)；<b>f<sub>(100)</sub></b> 系数表系数 C（100m 档距弧垂）；<b>L<sub>x</sub></b> 观测档距(m)；<b>cosB</b> 高差角余弦';
+  $(prefix + "_f_subst").innerHTML = subst
+    ? '<span class="lbl">代入数值</span>' + subst
+    : '<span class="lbl">代入数值</span><span style="color:#6a7c8c">填完必填项后显示</span>';
+}
+
+/* ===== 渲染：档端 ===== */
+function renderDy(){
+  var p = readDy();
+  $("dy_beta_h").style.display = (p.beta == null) ? "" : "none";
+  if (p.beta == null) $("dy_beta_h").innerHTML = "度分秒写法：3.0333 = 3°3′33″";
+  var r = calcDy(p);
+  if (r.empty){
+    setK("dy_o_ang_k", "观测角度");
+    setV("dy_o_ang", "—"); setV("dy_o_ang2", "填完必填项自动计算");
+    setV("dy_o_f", "—<small>m</small>"); setV("dy_o_coef", "");
+    setV("dy_af", "—");
+    ["dy_o_a","dy_o_cos","dy_o_f2","dy_o_diff","dy_o_adj"].forEach(function(id){ setV(id, "—"); });
+    $("dy_warn").innerHTML = "";
+    $("dy_steps").innerHTML = "";
+    showFormula("dy", p.formula, null);
+    state.dy = {};
+    return;
+  }
+  showFormula("dy", p.formula, r.subst);
+  if (r.noData){
+    setK("dy_o_ang_k", "观测角度");
+    setV("dy_o_ang", "—"); setV("dy_o_ang2", "弧垂表无数据");
+    setV("dy_o_f", "—<small>m</small>"); setV("dy_o_coef", "");
+    setV("dy_o_a", r.a == null ? "—" : r.a.toFixed(3) + "<small>m</small>");
+    setV("dy_af", "—");
+    ["dy_o_cos","dy_o_f2","dy_o_diff","dy_o_adj"].forEach(function(id){ setV(id, "—"); });
+    $("dy_warn").innerHTML = r.warn.map(function(w){ return '<div class="warn bad">' + w.t + "</div>"; }).join("");
+    $("dy_steps").innerHTML = "";
+    state.dy = r;
+    return;
+  }
+  setV("dy_o_ang", fmtDms(r.alphaDeg));
+  var _read = 270 + r.alphaDeg;
+  setK("dy_o_ang_k", "观测角度（" + (r.alphaDeg >= 0 ? "仰角" : "俯角") + "：" + fmtDms(_read, false) + "）");
+  setV("dy_o_ang2", "");
+  setV("dy_o_f", r.f.toFixed(3) + "<small>m</small>");
+  setV("dy_o_coef", "");
+  setV("dy_af", r.ratio == null ? "—" : r.ratio.toFixed(3));
+  setV("dy_o_a", r.a.toFixed(3) + "<small>m</small>");
+  setV("dy_o_cos", r.cosT.toFixed(6));
+  setV("dy_o_f2", r.f2 == null ? "—" : r.f2.toFixed(3) + "<small>m</small>");
+  setV("dy_o_diff", r.diff == null ? "—" : (r.diff >= 0 ? "大 " : "小 ") + Math.abs(r.diff).toFixed(3) + "<small>m</small>");
+  setV("dy_o_adj", r.adj == null ? "—" : r.adj.toFixed(3) + "<small>m</small>");
+  $("dy_warn").innerHTML = r.warn.map(function(w){
+    return '<div class="warn' + (w.bad ? " bad" : "") + '">' + w.t + "</div>";
+  }).join("");
+  $("dy_steps").innerHTML = r.steps.map(function(s){
+    return "<div><span>" + s[0] + "</span><span>" + s[1] + "</span></div>";
+  }).join("");
+  state.dy = r;
+}
+
+/* ===== 渲染：档外 ===== */
+function renderDw(){
+  var p = readDw();
+  var th = $("dw_t_h"); if (th) th.style.display = (p.t1 == null && p.t2 == null) ? "" : "none";
+  var r = calcDw(p);
+  if (r.empty){
+    setK("dw_o_ang_k", "观测角度");
+    setV("dw_o_ang", "—"); setV("dw_o_ang2", "填完必填项自动计算");
+    setV("dw_o_f", "—<small>m</small>"); setV("dw_o_coef", "");
+    setV("dw_af", "—");
+    ["dw_o_a","dw_o_h","dw_o_cos","dw_o_f2","dw_o_diff","dw_o_adj"].forEach(function(id){ setV(id, "—"); });
+    $("dw_warn").innerHTML = ""; $("dw_steps").innerHTML = "";
+    showFormula("dw", p.formula, null);
+    state.dw = {};
+    return;
+  }
+  showFormula("dw", p.formula, r.subst);
+  if (r.noData){
+    setK("dw_o_ang_k", "观测角度");
+    setV("dw_o_ang", "—"); setV("dw_o_ang2", "弧垂表无数据");
+    setV("dw_o_f", "—<small>m</small>"); setV("dw_o_coef", "");
+    setV("dw_o_a", r.a.toFixed(3) + "<small>m</small>");
+    setV("dw_o_h", r.h.toFixed(3) + "<small>m</small>");
+    setV("dw_af", "—");
+    ["dw_o_cos","dw_o_f2","dw_o_diff","dw_o_adj"].forEach(function(id){ setV(id, "—"); });
+    $("dw_warn").innerHTML = r.warn.map(function(w){ return '<div class="warn bad">' + w.t + "</div>"; }).join("");
+    $("dw_steps").innerHTML = "";
+    state.dw = r;
+    return;
+  }
+  if (r.tanA == null){
+    setK("dw_o_ang_k", "观测角度");
+    setV("dw_o_ang", "无解"); setV("dw_o_ang2", "请复核输入");
+  } else {
+    setV("dw_o_ang", fmtDms(r.alphaDeg));
+    var _read = 270 + r.alphaDeg;
+    setK("dw_o_ang_k", "观测角度（" + (r.alphaDeg >= 0 ? "仰角" : "俯角") + "：" + fmtDms(_read, false) + "）");
+    setV("dw_o_ang2", "");
+  }
+  setV("dw_o_f", r.f.toFixed(3) + "<small>m</small>");
+  setV("dw_o_coef", "");
+  setV("dw_af", r.ratio == null ? "—" : r.ratio.toFixed(3));
+  setV("dw_o_a", r.a.toFixed(3) + "<small>m</small>");
+  setV("dw_o_h", r.h.toFixed(3) + "<small>m</small>");
+  setV("dw_o_cos", r.cosT.toFixed(6));
+  setV("dw_o_f2", r.f2 == null ? "—" : r.f2.toFixed(3) + "<small>m</small>");
+  setV("dw_o_diff", r.diff == null ? "—" : (r.diff >= 0 ? "大 " : "小 ") + Math.abs(r.diff).toFixed(3) + "<small>m</small>");
+  setV("dw_o_adj", r.adj == null ? "—" : r.adj.toFixed(3) + "<small>m</small>");
+  $("dw_warn").innerHTML = r.warn.map(function(w){
+    return '<div class="warn' + (w.bad ? " bad" : "") + '">' + w.t + "</div>";
+  }).join("");
+  $("dw_steps").innerHTML = r.steps.map(function(s){
+    return "<div><span>" + s[0] + "</span><span>" + s[1] + "</span></div>";
+  }).join("");
+  state.dw = r;
+}
+
+/* ===== 渲染：系数表（可编辑） ===== */
+
+function fmtCell(x){
+  if (typeof x !== "number" || !isFinite(x)) return "";
+  return String(Math.round(x * 10000) / 10000);
+}
+function renderTb(){
+  var idx = curTbIdx();
+  var tb = TABLES[idx];
+  /* 空表且还是默认名（1..16 / 新表N）时，重命名框留空，让用户自己起名 */
+  var _nm = tb.name || "";
+  var _filler = !(tb.temps.length && tb.cols.length);
+  $("tb_name").value = (_filler && /^(\d+|新表\d*)$/.test(_nm)) ? "" : _nm;
+
+  if (!tb.temps.length || !tb.cols.length){
+    $("tb_table").innerHTML = "<div style='padding:26px 14px;text-align:center;color:#6a7c8c;font-size:13px;line-height:2'>" +
+      "这张表现在是空的。<br>把 Excel 里「档距那一行 + 温度那一列 + 数值」整块复制过来，点上面的【从 Excel 粘贴】；" +
+      "<br>或者点【添加行】【添加列】自己一格一格填。</div>";
+    $("tb_legend").innerHTML = "共 0 个温度点 × 0 个代表档距";
+    refreshLabels();
+    return;
+  }
+
+  var html = "<table class='edit'><thead><tr><th class='tcol' style='min-width:76px'>℃＼档距</th>";
+  for (var j = 0; j < tb.cols.length; j++){
+    html += "<th><input class='cell' data-kind='l' data-c='" + j + "' inputmode='decimal' value='" +
+            (isFinite(tb.cols[j]) ? tb.cols[j] : "") + "'></th>";
+  }
+  html += "</tr></thead><tbody>";
+  for (var i = 0; i < tb.temps.length; i++){
+    html += "<tr><td class='tcol'><input class='cell' data-kind='t' data-r='" + i + "' inputmode='decimal' value='" +
+            (isFinite(tb.temps[i]) ? tb.temps[i] : "") + "'></td>";
+    for (var j2 = 0; j2 < tb.cols.length; j2++){
+      var cls = "cell";
+      var val = tb.v[i] ? tb.v[i][j2] : null;
+      html += "<td><input class='" + cls + "' data-kind='v' data-r='" + i + "' data-c='" + j2 +
+              "' inputmode='decimal' value='" + fmtCell(val) + "'></td>";
+    }
+    html += "</tr>";
+  }
+  html += "</tbody></table>";
+  $("tb_table").innerHTML = html;
+
+  $("tb_legend").innerHTML = "共 " + tb.temps.length + " 个温度点 × " + tb.cols.length +
+    " 个代表档距（" + tb.cols[0] + "–" + tb.cols[tb.cols.length - 1] + " m）";
+  refreshLabels();
+}
+
+/* 网格编辑（事件委托，改完即算即存） */
+$("tb_table").addEventListener("input", function(e){
+  var el = e.target;
+  if (!el || !el.className || el.className.toString().indexOf("cell") < 0) return;
+  var idx = curTbIdx();
+  var tb = TABLES[idx];
+  var kind = el.getAttribute("data-kind");
+  var val = el.value.trim();
+  var x = val === "" ? null : parseFloat(val);
+  if (x != null && !isFinite(x)) return;
+  if (kind === "v"){
+    var r = parseInt(el.getAttribute("data-r"), 10), c = parseInt(el.getAttribute("data-c"), 10);
+    if (!tb.v[r]) tb.v[r] = [];
+    tb.v[r][c] = x;
+  } else if (kind === "t"){
+    tb.temps[parseInt(el.getAttribute("data-r"), 10)] = x;
+  } else if (kind === "l"){
+    tb.cols[parseInt(el.getAttribute("data-c"), 10)] = x;
+  }
+  persistTables();
+  renderDy(); renderDw();
+});
+$("tb_table").addEventListener("blur", function(e){
+  var el = e.target;
+  if (el && el.className && el.className.toString().indexOf("cell") >= 0 && el.getAttribute("data-kind") === "v"){
+    var val = el.value.trim();
+    if (val !== "") el.value = fmtCell(parseFloat(val));
+  }
+}, true);
+
+/* 名称编辑 → 同步下拉 */
+$("tb_name").addEventListener("input", function(){
+  var idx = curTbIdx();
+  TABLES[idx].name = $("tb_name").value;
+  syncSelectText();
+  persistTables();
+  renderDy(); renderDw();
+});
+
+/* 清空本表 / 恢复原表 */
+/* 确认框兜底：某些 WebView 外壳（没装 WebChromeClient）不会弹 confirm，
+   confirm 直接返回 false，会让"清空本表数据"这类按钮点了没反应。 */
+function askYes(msg){
+  try {
+    if (typeof window.confirm !== "function") return true;
+    return window.confirm(msg) !== false;
+  } catch(e){ return true; }
+}
+
+function clearTable(){
+  var idx = curTbIdx();
+  if (!askYes("把【" + TABLES[idx].name + "】的数据全部清空？温度和档距表头也一起清掉（清空前会留底，点下面【恢复本表】能找回）。")) return;
+  if (tbHasData(TABLES[idx]) || TABLES[idx].temps.length || TABLES[idx].cols.length) undoPut(idx, TABLES[idx]);
+  var tb = TABLES[idx];
+  tb.temps = []; tb.cols = []; tb.v = [];
+  persistTables(); renderTb(); renderDy(); renderDw();
+  toast("已清空（温度和档距也清掉了），可粘贴或自己加行加列");
+}
+function restoreTable(){
+  var idx = curTbIdx();
+  var snap = undoPick(idx);
+  if (!snap){ toast("这张表还没有可恢复的数据（清空过一次才会留底）"); return; }
+  if (!askYes("把【" + TABLES[idx].name + "】恢复成清空前的数据？现在表里的内容会丢。")) return;
+  var t = cloneTable(snap);
+  t.name = TABLES[idx].name;
+  TABLES[idx] = t;
+  persistTables(); renderTb(); renderDy(); renderDw();
+  toast("已恢复到清空前的数据");
+}
+function addRow(){
+  var tb = TABLES[curTbIdx()];
+  ensureRows(tb, tb.temps.length + 1);
+  if (!tb.cols.length) ensureCols(tb, 1);
+  ensureRows(tb, tb.temps.length);
+  persistTables(); renderTb();
+  toast("加了一行，改数字就行");
+}
+function addCol(){
+  var tb = TABLES[curTbIdx()];
+  if (!tb.temps.length) ensureRows(tb, 1);
+  ensureCols(tb, tb.cols.length + 1);
+  ensureRows(tb, tb.temps.length);
+  persistTables(); renderTb();
+  toast("加了一列，改数字就行");
+}
+/* ===== 从 Excel 粘贴 ===== */
+function togglePaste(){
+  var p = $("pastePanel");
+  if (p.classList.contains("hide")){
+    p.classList.remove("hide");
+    try { p.scrollIntoView({ block: "center" }); } catch(e){}
+    $("pasteBox").focus();
+  } else {
+    p.classList.add("hide");
+  }
+}
+function pasteMode(){
+  var r = document.querySelector('input[name="pmode"]:checked');
+  return r ? r.value : "auto";
+}
+function splitMatrix(text){
+  var t = String(text).replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/\u3000/g, " ");
+  var lines = t.split("\n");
+  while (lines.length && lines[lines.length - 1].trim() === "") lines.pop();
+  while (lines.length && lines[0].trim() === "") lines.shift();
+  var hasTab = t.indexOf("\t") >= 0;
+  var rows = lines.map(function(l){
+    var cells = hasTab ? l.split("\t") : l.split(/\s*[,;，；]\s*|\s{2,}/);
+    while (cells.length && String(cells[cells.length - 1]).trim() === "") cells.pop();
+    return cells;
+  });
+  return rows;
+}
+function toNum(x){
+  if (x === null || x === undefined) return null;
+  var s = String(x).replace(/[,\s，\u00a0]/g, "");
+  if (s === "" || s === "-" || s === "—" || s === "－") return null;
+  var n = parseFloat(s);
+  return isFinite(n) ? n : null;
+}
+function allNum(a){
+  return a.length > 0 && a.every(function(x){ return x !== null; });
+}
+/* 从粘贴块里抽出"含表头"的整表：第一行档距、第一列温度 */
+function extractFull(M){
+  if (M.length < 2) return null;
+  var w0 = M[0].length, wb = M[1].length;
+  if (wb <= 0) return null;
+  var body = M.slice(1);
+  var cols, temps, v;
+  if (wb === w0 + 1){
+    /* 没复制左上角那格：第一行全是档距，数据行比表头多一格温度 */
+    cols = M[0].map(toNum);
+    temps = body.map(function(r){ return toNum(r[0]); });
+    v = body.map(function(r){ return r.slice(1, 1 + cols.length).map(toNum); });
+  } else if (wb === w0){
+    /* 带左上角标签：角格必须不是数字 */
+    if (toNum(M[0][0]) !== null) return null;
+    cols = M[0].slice(1).map(toNum);
+    temps = body.map(function(r){ return toNum(r[0]); });
+    v = body.map(function(r){ return r.slice(1, 1 + cols.length).map(toNum); });
+  } else {
+    return null;
+  }
+  /* 丢掉空白行 */
+  var keep = [];
+  for (var i = 0; i < body.length; i++){
+    var blankVal = v[i].every(function(x){ return x === null; });
+    if (temps[i] === null && blankVal) continue;
+    keep.push(i);
+  }
+  temps = keep.map(function(i){ return temps[i]; });
+  v = keep.map(function(i){ return v[i]; });
+  if (!allNum(cols) || !allNum(temps)) return null;
+  if (cols.length < 1 || temps.length < 1) return null;
+  /* 方向纠正：万一把表复制成横的（温度在列、档距在行） */
+  var maxCol = Math.max.apply(null, cols), minT = Math.min.apply(null, temps);
+  if (maxCol < 100 && minT >= 100){
+    var nc = temps.slice(), nt = cols.slice(), nv = [];
+    for (var r = 0; r < nc.length; r++){
+      var row = [];
+      for (var c = 0; c < nt.length; c++) row.push(v[c] ? v[c][r] : null);
+      nv.push(row);
+    }
+    cols = nt; temps = nc; v = nv;
+  }
+  return { cols: cols, temps: temps, v: v };
+}
+function ensureRows(tb, n){
+  while (tb.temps.length < n){
+    var L = tb.temps[tb.temps.length - 1], Pv = tb.temps[tb.temps.length - 2];
+    if (tb.temps.length === 0){ tb.temps.push(0); continue; }
+    var st = (isFinite(L) && isFinite(Pv) && L !== Pv) ? (L - Pv) : 10;
+    tb.temps.push(isFinite(L) ? Math.round((L + st) * 100) / 100 : 10);
+  }
+  while (tb.v.length < tb.temps.length) tb.v.push([]);
+  tb.v.forEach(function(r){ while (r.length < tb.cols.length) r.push(null); });
+}
+function ensureCols(tb, n){
+  while (tb.cols.length < n){
+    var L = tb.cols[tb.cols.length - 1], Pv = tb.cols[tb.cols.length - 2];
+    if (tb.cols.length === 0){ tb.cols.push(100); continue; }
+    var st = (isFinite(L) && isFinite(Pv) && L !== Pv) ? (L - Pv) : 25;
+    tb.cols.push(isFinite(L) ? Math.round((L + st) * 100) / 100 : 125);
+  }
+  tb.v.forEach(function(r){ while (r.length < tb.cols.length) r.push(null); });
+}
+function pasteText(text, mode, anchorR, anchorC, anchorKind){
+  var M = splitMatrix(text);
+  if (!M.length || !M[0].length) return { ok: false, msg: "没有可粘贴的内容" };
+  var tb = TABLES[curTbIdx()];
+  if (mode !== "data"){
+    var full = extractFull(M);
+    if (full){
+      tb.cols = full.cols;
+      tb.temps = full.temps;
+      tb.v = full.v;
+      tb.v.forEach(function(r){ while (r.length < tb.cols.length) r.push(null); });
+      while (tb.v.length < tb.temps.length) tb.v.push(new Array(tb.cols.length).fill(null));
+      persistTables(); renderTb(); renderDy(); renderDw();
+      return { ok: true, msg: "已整表粘贴：温度 " + tb.temps.length + " 行 × 档距 " + tb.cols.length +
+        " 列，温度和档距都用你粘的数据" };
+    }
+    if (mode === "full"){
+      return { ok: false, msg: "没认出表头：请把 Excel 里的第一行（档距）和第一列（温度）一起选进来，左上角那格留空或写标签" };
+    }
+  }
+  var wide = 0;
+  M.forEach(function(r){ if (r.length > wide) wide = r.length; });
+  if (anchorKind === "l"){
+    var c0 = anchorC || 0, nums = M[0].map(toNum);
+    ensureCols(tb, c0 + nums.length);
+    nums.forEach(function(v, k){ if (v !== null) tb.cols[c0 + k] = v; });
+  } else if (anchorKind === "t"){
+    var r0t = anchorR || 0, tv = M.map(function(r){ return toNum(r[0]); });
+    ensureRows(tb, r0t + tv.length);
+    tv.forEach(function(v, k){ if (v !== null) tb.temps[r0t + k] = v; });
+  } else {
+    var rr0 = anchorR || 0, cc0 = anchorC || 0;
+    ensureRows(tb, rr0 + M.length);
+    ensureCols(tb, cc0 + wide);
+    for (var i = 0; i < M.length; i++){
+      for (var j = 0; j < M[i].length; j++){
+        var rr = rr0 + i, cc = cc0 + j;
+        if (rr >= tb.v.length || cc >= tb.cols.length) continue;
+        tb.v[rr][cc] = toNum(M[i][j]);
+      }
+    }
+  }
+  persistTables(); renderTb(); renderDy(); renderDw();
+  return { ok: true, msg: "已粘贴 " + M.length + " 行 × " + wide + " 列（只填数据）" };
+}
+function doPaste(){
+  var txt = $("pasteBox").value;
+  if (!txt.trim()){ toast("先把 Excel 里的数据复制，粘到上面的框里"); return; }
+  var res = pasteText(txt, pasteMode(), 0, 0, "v");
+  toast(res.msg);
+  if (res.ok){ $("pasteBox").value = ""; $("pastePanel").classList.add("hide"); }
+}
+$("tb_table").addEventListener("paste", function(e){
+  var cd = e.clipboardData || window.clipboardData;
+  var txt = cd ? cd.getData("text") : "";
+  if (!txt || !txt.trim()) return;
+  e.preventDefault();
+  var el = e.target;
+  var kind = (el && el.getAttribute) ? (el.getAttribute("data-kind") || "v") : "v";
+  var r = parseInt(el.getAttribute("data-r"), 10);
+  var c = parseInt(el.getAttribute("data-c"), 10);
+  if (isNaN(r)) r = 0;
+  if (isNaN(c)) c = 0;
+  var res = pasteText(txt, "auto", r, c, kind);
+  toast(res.msg);
+});
+
+/* 持久化 */
+function persistTables(){
+  try {
+    var o = JSON.parse(localStorage.getItem(LSKEY) || "{}");
+    o.v3 = 1;
+    o.tables = TABLES;
+    localStorage.setItem(LSKEY, JSON.stringify(o));
+  } catch(e){}
+  /* 顺手存一份到手机公共存储，卸载重装/清数据后能一键找回 */
+  try { if (window.__licBakSync) window.__licBakSync(); } catch(e){}
+}
+function restoreFromBackup(){
+  if (!askYes("用手机里存的备份恢复弧垂表？现在表里的内容会被覆盖。")) return;
+  var d = "";
+  try { d = window.__licRestoreTb ? String(window.__licRestoreTb() || "") : ""; } catch(e){}
+  if (!d){ toast("没找到备份数据"); return; }
+  toast("已恢复到 " + d + " 的备份，正在重新载入…");
+  setTimeout(function(){ try { location.reload(); } catch(e){} }, 800);
+}
+var FIELD_IDS = ["dy_label","dy_temp","dy_lrep","dy_lobs","dy_beta","dy_h","dy_fit","dy_ih","dy_chk","dy_tens",
+                 "dw_label","dw_temp","dw_lrep","dw_l1","dw_lobs","dw_t1","dw_t2","dw_chk","dw_tens","fx_formula",
+                 "tb_sel"];
+function saveForm(){
+  try {
+    var o = JSON.parse(localStorage.getItem(LSKEY) || "{}");
+    o.v = 2; o.stake = $("mStake").value; o.date = $("mDate").value; o.d = {};
+    FIELD_IDS.forEach(function(id){ o.d[id] = $(id).value; });
+    localStorage.setItem(LSKEY, JSON.stringify(o));
+  } catch(e){}
+}
+function loadForm(){
+  try {
+    var s = JSON.parse(localStorage.getItem(LSKEY) || "null");
+    if (!s) return;
+    if (s.stake != null) $("mStake").value = s.stake;
+    if (s.date) $("mDate").value = s.date;
+    if (s.d) FIELD_IDS.forEach(function(id){
+      if (typeof s.d[id] === "string" && $(id).value !== undefined) $(id).value = s.d[id];
+    });
+  } catch(e){}
+}
+
+/* 复制结果 */
+function copyRes(kind){
+  var stake = $("mStake").value.trim(), date = $("mDate").value.trim();
+  var lines = [];
+  if (kind === "dy"){
+    var r = state.dy;
+    if (!r || r.empty || r.noData) return;
+    lines.push("【档端角度法】" + (stake ? " 档号 " + stake : "") + (date ? "  " + date : ""));
+    lines.push("线型 " + r.name + "｜温度 " + $("dy_temp").value + "℃｜代表档距 " + $("dy_lrep").value +
+      "m｜观测档距 " + $("dy_lobs").value + "m");
+    lines.push("滑车角 " + fmtDms(parseAngle($("dy_beta").value)) + "｜挂点呼高 " + $("dy_h").value +
+      "m｜串长 " + ($("dy_fit").value || 0) + "m｜仪器高 " + ($("dy_ih").value || 0) + "m");
+    lines.push("系数 C = " + r.coef.toFixed(4) + "（公式" + r.formula + "）");
+    lines.push("观测弧垂 f = " + r.f.toFixed(3) + " m");
+    lines.push("观测角度 = " + fmtDms(r.alphaDeg, false) + "（" + degToDmssNum(r.alphaDeg).toFixed(4) + "）");
+    if (r.f2 != null) lines.push("检验弧垂 f′ = " + r.f2.toFixed(3) + " m");
+    if (r.diff != null) lines.push("弧垂差值 = " + (r.diff >= 0 ? "大 " : "小 ") + Math.abs(r.diff).toFixed(3) + " m");
+    if (r.adj != null) lines.push("调整线长 ΔL = " + r.adj.toFixed(3) + " m");
+  } else {
+    var r2 = state.dw;
+    if (!r2 || r2.empty || r2.noData) return;
+    lines.push("【档外角度法】" + (stake ? " 档号 " + stake : "") + (date ? "  " + date : ""));
+    lines.push("线型 " + r2.name + "｜温度 " + $("dw_temp").value + "℃｜代表档距 " + $("dw_lrep").value +
+      "m｜临近档距 " + $("dw_l1").value + "m｜观测档距 " + $("dw_lobs").value + "m");
+    lines.push("切线角 近 " + fmtDms(parseAngle($("dw_t1").value)) + "｜远 " + fmtDms(parseAngle($("dw_t2").value)));
+    lines.push("系数 C = " + r2.coef.toFixed(4) + "（公式" + r2.formula + "）");
+    lines.push("观测弧垂 f = " + r2.f.toFixed(3) + " m");
+    if (r2.tanA != null) lines.push("观测角度 = " + fmtDms(r2.alphaDeg, false) + "（" + degToDmssNum(r2.alphaDeg).toFixed(4) + "）");
+    if (r2.f2 != null) lines.push("检验弧垂 f′ = " + r2.f2.toFixed(3) + " m");
+    if (r2.diff != null) lines.push("弧垂差值 = " + (r2.diff >= 0 ? "大 " : "小 ") + Math.abs(r2.diff).toFixed(3) + " m");
+    if (r2.adj != null) lines.push("调整线长 ΔL = " + r2.adj.toFixed(3) + " m");
+  }
+  var txt = lines.join("\n");
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){ toast("已复制，可直接粘贴到记录表"); },
+      function(){ fallbackCopy(txt); });
+  } else fallbackCopy(txt);
+}
+function fallbackCopy(txt){
+  var ta = document.createElement("textarea");
+  ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); toast("已复制"); } catch(e){ alert(txt); }
+  document.body.removeChild(ta);
+}
+function toast(msg){
+  var d = document.createElement("div");
+  d.textContent = msg;
+  d.style.cssText = "position:fixed;left:50%;bottom:36px;transform:translateX(-50%);background:#123a5a;color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,.25)";
+  document.body.appendChild(d);
+  setTimeout(function(){ if (d.parentNode) document.body.removeChild(d); }, 1800);
+}
+function resetAll(kind){
+  var ids = kind === "dy"
+    ? ["dy_temp","dy_lrep","dy_lobs","dy_beta","dy_h","dy_fit","dy_ih","dy_chk","dy_tens"]
+    : ["dw_temp","dw_lrep","dw_l1","dw_lobs","dw_t1","dw_t2","dw_chk","dw_tens"];
+  ids.forEach(function(i){ $(i).value = ""; });
+  kind === "dy" ? renderDy() : renderDw();
+  saveForm();
+}
+
+/* ===== 初始化 ===== */
+var UNDOKEY = "chidu_undo";
+function emptyV(tb){ return tb.temps.map(function(){ return new Array(tb.cols.length).fill(null); }); }
+function tbHasData(tb){
+  for (var i = 0; i < tb.v.length; i++){
+    var r = tb.v[i]; if (!r) continue;
+    for (var j = 0; j < r.length; j++){
+      if (r[j] !== null && r[j] !== "" && r[j] !== undefined) return true;
+    }
+  }
+  return false;
+}
+function undoPut(idx, tb){
+  try {
+    var u = JSON.parse(localStorage.getItem(UNDOKEY) || "{}") || {};
+    u[idx] = cloneTable(tb);
+    localStorage.setItem(UNDOKEY, JSON.stringify({ v: 1, d: u }));
+  } catch(e){}
+}
+function undoPick(idx){
+  try {
+    var u = JSON.parse(localStorage.getItem(UNDOKEY) || "null");
+    if (u && u.d && u.d[idx]) return u.d[idx];
+  } catch(e){}
+  return null;
+}
+var TABLES = ORIGINAL.map(function(t){ return { name: t.name, temps: [], cols: [], v: [] }; });
+applySaved();
+initLabels();
+loadForm();
+
+if (!$("mDate").value){
+  var d0 = new Date();
+  $("mDate").value = d0.getFullYear() + "-" + String(d0.getMonth() + 1).padStart(2, "0") + "-" + String(d0.getDate()).padStart(2, "0");
+}
+/* 打开时不预填任何参数，输入框一律为空，由用户自己填 */
+
+document.querySelectorAll("#pane-dy input, #pane-dy select").forEach(function(el){
+  el.addEventListener("input", function(){ renderDy(); saveForm(); });
+  el.addEventListener("change", function(){ renderDy(); saveForm(); });
+});
+document.querySelectorAll("#pane-dw input, #pane-dw select").forEach(function(el){
+  el.addEventListener("input", function(){ renderDw(); saveForm(); });
+  el.addEventListener("change", function(){ renderDw(); saveForm(); });
+});
+var fxSel = $("fx_formula");
+if (fxSel){ fxSel.addEventListener("change", function(){ renderDy(); renderDw(); saveForm(); }); }
+$("tb_sel").addEventListener("change", function(){
+  if ($("tb_sel").value === "__new"){ newTable(); return; }
+  refreshLabels(); renderTb(); saveForm();
+});
+/* 兜底：存档里的表号若已不存在，回落到第一张有内容的表 */
+(function(){
+  ["dy_label","dw_label","tb_sel"].forEach(function(id){
+    var s = $(id);
+    if (!s.value && s.options.length) s.value = s.options[0].value;
+  });
+})();
+["mStake","mDate"].forEach(function(i){ $(i).addEventListener("input", saveForm); });
+
+document.querySelectorAll("nav button").forEach(function(b){
+  b.addEventListener("click", function(){
+    document.querySelectorAll("nav button").forEach(function(x){ x.classList.remove("on"); });
+    b.classList.add("on");
+    ["dy","dw","tb"].forEach(function(k){ $("pane-" + k).classList.add("hide"); });
+    $("pane-" + b.dataset.tab).classList.remove("hide");
+    if (b.dataset.tab === "tb") renderTb();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
+
+renderDy(); renderDw(); renderTb();
+saveForm();
+</script>
+
+<script>
+/* 现场版：不联网、不设试用期；仅在本机保存表格与输入内容。 */
+function showFieldHelp(){
+  alert("使用顺序：\n1. 在“百米弧垂表”中新建或粘贴弧垂表；\n2. 选择对应表格并填写观测参数；\n3. 结果会自动计算，点“复制结果”可发送到工作群或保存到记录。\n\n角度支持十进制度和度分秒写法，例如 3.0333 代表 3°3′33″。");
+}
+(function(){
+  var required = {
+    dy:["dy_label","dy_temp","dy_lrep","dy_lobs","dy_h","dy_fit","dy_ih"],
+    dw:["dw_label","dw_temp","dw_lrep","dw_l1","dw_lobs","dw_t1","dw_t2"]
+  };
+  function mark(kind){
+    required[kind].forEach(function(id){
+      var e = document.getElementById(id); if (!e) return;
+      var empty = !String(e.value || "").trim();
+      e.classList.toggle("field-missing", empty);
+    });
+  }
+  ["dy","dw"].forEach(function(kind){
+    required[kind].forEach(function(id){
+      var e = document.getElementById(id); if (!e) return;
+      e.addEventListener("blur", function(){ mark(kind); });
+      e.addEventListener("input", function(){ e.classList.remove("field-missing"); });
+      e.addEventListener("change", function(){ e.classList.remove("field-missing"); });
+    });
+  });
+  var oldCopy = window.copyRes;
+  window.copyRes = function(kind){
+    mark(kind); return oldCopy(kind);
+  };
+})();
+</script>
+</body>
+</html>

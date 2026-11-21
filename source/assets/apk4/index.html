@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>微算助手</title>
+  <style>
+    :root{--blue:#1479d1;--deep:#083f71;--bg:#edf4f9;--ink:#18364e;--muted:#668094;--line:#d9e6ef;--orange:#ec7b24}
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#e7f2fb 0,#f4f8fb 260px);font-family:"Microsoft YaHei",system-ui,sans-serif;color:var(--ink)}
+    header{height:64px;display:flex;align-items:center;padding:0 16px;background:rgba(255,255,255,.93);border-bottom:1px solid #dce8f1;box-shadow:0 2px 12px rgba(31,83,119,.06)}.back{display:inline-flex;align-items:center;gap:7px;color:#176eb8;text-decoration:none;border:1px solid #bcd8ed;background:#f8fcff;border-radius:22px;padding:9px 14px;font-size:14px;font-weight:700;box-shadow:0 2px 5px rgba(34,108,158,.08)}.back:active{transform:scale(.97)}.wrap{max-width:680px;margin:auto;padding:14px}
+    .hero{margin:8px 0 14px;padding:23px 20px 20px;border-radius:18px;background:linear-gradient(135deg,#084a83,#1685d7);color:#fff;box-shadow:0 10px 22px rgba(18,101,164,.22)}h1{font-size:25px;letter-spacing:.5px;margin:0 0 8px}.hero p{margin:0;opacity:.9;font-size:13px;line-height:1.65}.notice{margin:0 0 14px;padding:11px 12px;border:1px solid #ffe0bd;background:#fffaf5;border-radius:12px;font-size:12px;line-height:1.6;color:#805024}
+    h2{font-size:15px;margin:18px 3px 10px;color:#33546f}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.card{display:block;text-decoration:none;color:inherit;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:15px;padding:15px 13px;box-shadow:0 3px 10px rgba(24,81,116,.07);transition:transform .12s,box-shadow .12s}.card:active{transform:scale(.978);box-shadow:none;background:#f7fbff}.card strong{display:block;font-size:15px;margin-bottom:6px}.card span{display:block;color:var(--muted);font-size:12px;line-height:1.5}.primary{border-color:#8dc4eb;background:linear-gradient(135deg,#eaf7ff,#fff)}.primary strong{color:#096fbd}.tag{display:inline-block;background:#e3f3ff;color:#0870bb;font-size:11px;border-radius:20px;padding:3px 8px;margin-bottom:7px}.wide{grid-column:1/-1}.footer{font-size:11px;color:#8295a5;text-align:center;padding:25px 4px 14px;line-height:1.65}
+  </style>
+</head>
+<body>
+  <header><a class="back" href="weisu://back">← 返回计算器</a></header>
+  <main class="wrap">
+    <section class="hero"><h1>工程计算工具库</h1><p>电力施工常用计算集中入口。各工程模块沿用经核对的原版页面与计算公式。</p></section>
+    <div class="notice"><b>工程使用提示：</b>本工具用于辅助计算。结果须按工程规程、设计资料和人工复核确认后使用；本版未改动原版工程计算页面的公式或脚本。</div>
+    <h2>常用入口</h2>
+    <div class="grid">
+      <a class="card primary" href="custom_formula.html"><strong>自定义公式（°′″）</strong><span>角度直接输入度、分、秒，无需手动换算</span></a>
+      <a class="card primary wide" href="chidu/index.html"><i class="tag">新增入口</i><strong>弛度观测与百米弧垂表</strong><span>档端角度法、档外角度法、百米弧垂表；支持从 Excel 复制单元格区域后粘贴到表格。</span></a>
+      <a class="card primary" href="chuangkou3.html"><strong>弧垂计算</strong><span>沿用 apk4 原始页面与公式</span></a>
+      <a class="card" href="chuangkou1.html"><strong>复测</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou2.html"><strong>分坑</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou4.html"><strong>样板校正</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou6.html"><strong>其他计算</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou7.html"><strong>角钢预算</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou8.html"><strong>弧垂插入法</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou9.html"><strong>设计弧垂转施工弧垂</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou10.html"><strong>基础方量</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou11.html"><strong>模板角钢反坡</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou12.html"><strong>正侧对面斜长计算</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou13.html"><strong>单坡角度正反算</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou14.html"><strong>坐标算角度距离</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou15.html"><strong>斜面斜顶计算</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou16.html"><strong>预抬计算</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou17.html"><strong>连续上下山</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou18.html"><strong>基础订高桩计算</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou19.html"><strong>基础浇筑计算</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou21.html"><strong>基础检查</strong><span>原始公式页面</span></a>
+      <a class="card" href="chuangkou22.html"><strong>转角塔位移计算</strong><span>原始公式页面</span></a>
+    </div>
+    <h2>原版完整工程页面</h2>
+    <div class="grid"><a class="card" href="chuangkou4.html"><strong>样板校正</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou5.html"><strong>注册登录（原版页面）</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou6.html"><strong>其他计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou7.html"><strong>角钢预算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou8.html"><strong>弧垂插入法</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou9.html"><strong>设计弧垂转施工弧垂</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou10.html"><strong>基础方量</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou11.html"><strong>模板角钢反坡</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou12.html"><strong>正侧对面斜长计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou13.html"><strong>单坡角度正反算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou14.html"><strong>坐标算角度距离</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou15.html"><strong>斜面斜顶计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou16.html"><strong>预抬计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou17.html"><strong>连续上下山调整值</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou18.html"><strong>基础订高桩计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou19.html"><strong>基础浇筑计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou20.html"><strong>原版工程入口</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou21.html"><strong>基础检查</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou22.html"><strong>转角塔位移计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou23.html"><strong>创建公式</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou24.html"><strong>自定义公式</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou25.html"><strong>编辑公式</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou26.html"><strong>价格计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou27.html"><strong>单分裂引流计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou28.html"><strong>双分裂引流计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou29.html"><strong>三分裂引流计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou30.html"><strong>四分裂引流计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou31.html"><strong>六分裂引流计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou32.html"><strong>八分裂引流计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou33.html"><strong>引流计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou34.html"><strong>引流辅助计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou35.html"><strong>十分裂引流计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou36.html"><strong>钢筋配置计算</strong><span>原版公式页面，已移除余额门控</span></a><a class="card" href="chuangkou37.html"><strong>牵引力计算</strong><span>原版公式页面，已移除余额门控</span></a></div>
+    <p class="footer">“原始公式页面”均直接使用 apk4 的原 HTML 与 JavaScript。首页仅提供导航，不参与公式计算。</p>
+  </main>
+</body></html>

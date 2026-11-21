@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+        <meta charset="utf-8">
+        <title>牵引力计算</title>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link href="css/mui.min.css" rel="stylesheet"/>
+        <link href="css/icons-extra.css" rel="stylesheet"/>
+        <link rel="icon" href="favicon.png" type="images/x-ico" />
+        <style type="text/css">
+            body{background-color:#EFEFF4;}
+        </style>
+        <style>
+        :root{
+          --ink:#1C2733; --ink-2:#4A5766; --mut:#8A96A3;
+          --blue:#16324F; --blue-2:#21476B; --line:#D7DEE5; --bg:#F2F5F7; --card:#FFFFFF;
+          --accent:#007AFF; --accent-soft:#80BDFF;   /* 强调蓝=#007AFF；淡蓝=浅一半 #80BDFF */
+        }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-text-size-adjust:100%}
+    body{
+      background:var(--bg); color:var(--ink);   /* 字体/字号/行距均由 MUI 原生控制（页面1 同款），页面自身不强制覆盖 */
+    }
+    .wrap{max-width:100%;margin:0 auto;padding:2px 2px 50px}   /* 两个卡片对左右边距保持 2px，卡片宽度最大化；底部预留 104px（导航栏 50 + 固定按钮条 52 + 余量），防固定按钮遮挡内容 */
+    header.top{display:block;text-align:center;margin-bottom:6px}   /* 标题水平居中、压低高度 */
+    h1{font-size:19px;font-weight:800;color:var(--blue);letter-spacing:.5px;text-align:center}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 6px;margin-bottom:2px}
+    .card h2{font-size:14.5px;font-weight:700;color:var(--blue);margin-bottom:0px;display:flex;align-items:baseline;gap:8px}   /* 小字提示与标题文字底边对齐 */
+    .card h2.tbl-hd{margin-bottom:2px}   /* “塔基数据”标题与表格之间保持 20px 间距 */
+    .grid-params{display:grid;grid-template-columns:repeat(6,1fr);gap:4px 2px}   /* 桌面端 6 个参数输入框排为 1 行；行/列间距与移动端一致 */
+    .param label{display:block;font-size:14px;line-height:1.3;color:var(--ink-2);margin-bottom:1px}   /* 桌面端：标签与输入框垂直间距加大（移动端在媒体查询中恢复紧凑值） */
+    .param label b{color:var(--blue);font-weight:700}
+    .param input,.tbl input{
+      margin:0;width:100%;border:1px solid #A9C6E8;border-radius:4px;padding:3px 6px;   /* 输入框边框淡蓝；margin:0 抵消 MUI 全局 input 下边距 15px，保证表格行内输入框与文本等高 */
+      font-family:inherit;font-size:12px;color:var(--ink);background:#fff;font-variant-numeric:tabular-nums;   /* 输入框背景白色 */
+    }
+    .param input{height:30px;box-sizing:border-box;font-size:15px}   /* 参数输入框高度 30px、字号 16px；表格输入框 .tbl input 同为 16px，字号保持一致 */
+    .tbl input:disabled{background:#fff;color:#000;cursor:not-allowed;opacity:.9}   /* 张力场/牵引场塔号锁定：白底黑字、不可编辑 */
+    .param input:focus,.tbl input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+    .param .unit{font-size:11px;color:var(--mut)}
+    .k-ctl{display:flex;flex-wrap:nowrap;align-items:center;gap:10px 10px;margin-top:12px;margin-bottom:12px;
+      background:transparent;border:1px solid var(--accent);border-radius:5px;padding:4px 10px}   /* 背景取消，边框蓝色；桌面端外边距加大（移动端在媒体查询中恢复） */
+    .k-ctl .lbl{font-weight:700;color:var(--blue)}
+    .k-ctl input[type=range]{flex:1;min-width:80px;accent-color:var(--accent)}
+    .k-ctl .r-item.main{flex:none}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:6px}   /* 表格自然高度，全部行完整显示 */
+    table{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}   /* 列宽按百分比随屏幕宽度自动计算，移动端完整显示 */
+    colgroup col.c-type{width:16%}
+    colgroup col.c-num{width:18%}
+    colgroup col.c-li{width:18%}
+    colgroup col.c-mil{width:18%}
+    colgroup col.c-dh{width:14%}
+    colgroup col.c-tp{width:15%}
+    thead th{
+      position:sticky;top:0px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;   /* 表头蓝色背景、白色文字；字号与顶部参数输入框一致 16px */
+      padding:2px 0.5px;text-align:center;white-space:normal;z-index:2;line-height:1.1;   /* 表头允许换行、间距与 36 页一致（上下 2px、左右 0.5px） */
+    }
+    tbody td{padding:2px 1px;border-top:1px solid #E7ECF1;text-align:center;font-size:15px;line-height:24px}   /* 数据单元格字号与顶部参数输入框一致 16px；行高 24px 可容纳 */
+    tbody td.c-mil.auto,tbody td.c-dh.auto,tbody td.c-tp.auto{color:var(--accent)}   /* 计算结果 3 列蓝色文字（覆盖 .tbl .auto） */
+    tbody tr:nth-child(even) td{background:#F7FAFC}
+    .tick-wrap{position:relative;display:block}
+    .tick-wrap .tick{position:absolute;left:3px;top:50%;transform:translateY(-50%);width:13px;height:13px;border-radius:50%;background:var(--accent) !important;color:#fff !important;font-weight:900;font-size:9px;line-height:13px;text-align:center;opacity:1 !important;pointer-events:none}   /* ✓ 蓝色圆圈，任何状态下保持蓝色不透明，与塔基一致 */
+    .tick-wrap input{padding-left:21px}   /* 输入框内左侧留出圆圈空间 */
+    tbody tr.off td{opacity:.42}
+    tbody tr.unchecked{display:none}   /* 未勾选（N>k）整行不显示 */
+    .tbl input{padding:2px 6px;font-size:15px;text-align:center;background:#fff;height:28px}   /* 表格输入框字号与顶部参数输入框一致 16px */
+    td.c-no small{display:block;font-size:13px;color:var(--mut);font-weight:400}
+    .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:4px}
+    .r-item{background:#FBFCFD;border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+    .r-item .name{font-size:12px;color:var(--ink-2);margin-bottom:4px}
+    .r-item .val{font-size:14px;font-weight:700;color:var(--blue);font-variant-numeric:tabular-nums;word-break:break-all}   /* 字号与移动端一致 */
+    .r-item.main{background:transparent;border-color:var(--accent);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2px 6px}   /* 背景取消，边框蓝色 */
+    .r-item.main .val{color:var(--accent);font-size:15px;padding-top:0;margin-top:1px;line-height:1.15}   /* 动态牵引力数值字号与移动端一致 */
+    .r-item.main .name{color:var(--blue-2);padding-bottom:0;margin-bottom:1px;line-height:1.15}   /* 上行文字：下内边距 0px、下外边距 1px */
+    .btnrow{margin-top:14px;display:flex;gap:5px;flex-wrap:wrap}
+    /* 底部计算按钮：清除镂空 + 开始计算蓝色实心，并排等宽同高 40px、间距 10px，点击才执行计算；参考 36 页固定显示在底部（导航栏上方），滚动时始终可见 */
+    .calc-bar{position:fixed;left:0;right:0;bottom:50px;display:flex;gap:10px;margin:0;padding:6px 10px;
+      background:var(--card);border-top:1px solid var(--line);z-index:5}
+    #btn-clear{height:40px;flex:1 1 0;padding:0;background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:6px;font:inherit;
+      font-size:16px;font-weight:600;letter-spacing:1px;cursor:pointer}   /* 蓝色镂空，与开始计算等宽同高 */
+    #btn-clear:hover{background:var(--accent-soft)}
+    #btn-calc{flex:1 1 0;height:40px;padding:0;background:var(--accent);color:#fff;border:0;border-radius:6px;font:inherit;
+      font-size:16px;font-weight:600;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 6px rgba(0,122,255,.25)}
+    #btn-calc:hover{background:#0066E6}
+    #btn-calc:active{background:#0055CC}
+    .param-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:5px}   /* 基本参数标题靠左、按钮组靠右，一行显示 */
+    .param-head h2{margin-bottom:0;flex:none}
+    .param-head .btnrow{margin-top:0;flex:none}
+    .mask{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;display:flex;align-items:center;justify-content:center}
+    .modal{background:#fff;border-radius:10px;padding:10px 15px;min-width:300px;max-width:88vw;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+    .modal-title{font-size:15px;font-weight:600;margin-bottom:5px}
+    .modal-help{width:65vw;max-width:65vw}   /* 桌面端：软件说明模态框宽度 65vw（移动端在媒体查询中保持 98vw） */
+    .modal-msg{font-size:14px;color:#555;margin-bottom:20px;line-height:1.7}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end}
+    .modal-scroll + .modal-actions{margin-top:5px}   /* 软件说明：关闭按钮与内容区留 5px 空隙 */
+    .modal-scroll{max-height:85vh;overflow:auto;font-size:13px;color:#333;line-height:1.5;padding-right:8px}
+    .modal-scroll h4{margin:10px 0 4px;font-size:14px;color:var(--blue)}
+    .modal-scroll p{margin:4px 0;text-align:left}
+    .modal-scroll .f{font-weight:600}
+    .modal-scroll ul{margin:4px 0 4px 18px;padding:0}
+    .btn{border:1px solid var(--accent);background:transparent;color:var(--accent);font:inherit;font-size:13px;font-weight:600;   /* 蓝色边框、蓝色文字、背景镂空 */
+      border-radius:5px;padding:3px 16px;cursor:pointer}   /* 减小按钮高度 */
+    .btn:hover{background:var(--accent-soft)}   /* hover 淡蓝底反馈 */
+    .btn.primary{border-color:var(--accent);color:var(--accent);background:transparent}   /* primary 同样镂空 */
+    .btn.primary:hover{background:var(--accent-soft)}
+    footer{margin-top:4px;font-size:11.5px;color:var(--mut);line-height:1.7}   /* 页脚紧贴表格，避免底部大面积留白 */
+    @media (max-width:560px){
+      .grid-params{grid-template-columns:repeat(3,1fr)}   /* 唯一差异：移动端 6 个参数 2 行 3 列；其余字号/间距已与桌面端统一 */
+      .param label{line-height:1;margin-bottom:1px}   /* 移动端：标签与输入框保持原紧凑间距（字号/行距合理） */
+      .k-ctl{margin-top:5px;margin-bottom:5px}   /* 移动端：k-ctl 保持原外边距 */
+      .modal-help{width:98vw;max-width:98vw}   /* 移动端：软件说明模态框保持 98vw */
+    }
+    .print-head{display:none}
+    @media print{
+      .mui-bar-nav,.mui-bar-tab,#标题栏1,#导航栏1{display:none !important}   /* 打印排除顶部标题栏与底部导航栏 */
+      .mui-content{padding:0 !important}   /* 两个栏隐藏后，取消 mui-content 为其预留的上下留白 */
+      .print-head{display:block;text-align:center;font-weight:700;font-size:15px;padding:10px 0 14px;border-bottom:1px solid #999;margin-bottom:14px;color:#333}
+      .print-head .ph-t{font-size:25px;display:block}   /* 页眉第二行“牵引力计算”5 个字放大到 25px */
+      .btnrow{display:none}   /* 打印时不显示 重置 / 打印 按钮 */
+      .calc-bar{display:none}   /* 打印时不显示底部计算按钮 */
+      .wrap{padding-bottom:6px}   /* 打印：取消固定按钮预留的底部留白 */
+      .grid-params{grid-template-columns:repeat(6,1fr);gap:6px 8px}   /* 打印：顶部 6 个参数输入框排为 1 行 */
+      /* 打印字体与前端显示一致：不覆盖 label/input 字号，沿用屏幕样式（label 14px、input 16px） */
+      table#tbl{width:100%;font-size:15px}   /* 打印按屏幕宽度自适应 */
+      table#tbl th,table#tbl td,table#tbl input{font-size:15px}   /* 打印：表头/单元格/输入框字号与前端一致 16px */
+      .table-wrap{height:auto;max-height:none;overflow:visible}   /* 打印完整表格 */
+      tr{break-inside:avoid;page-break-inside:avoid}     /* 牵引场行不跨页截断 */
+    }
+    @page{margin:10mm}
+    /* 移动端截图模式：截取卡片 #shot-card（页眉截图前临时移入卡片顶部），排版/字体与页面显示一致，仅隐藏卡片内的 清除/重置/打印/说明 按钮 */
+    .print-shot .btnrow{display:none}
+    .print-shot .calc-bar{display:none}   /* 截图时不包含底部计算按钮 */
+    .print-shot .print-head{display:block;text-align:center;font-weight:700;font-size:15px;padding:10px 0 14px;border-bottom:1px solid #999;margin-bottom:14px;color:#333}   /* 截图页眉与打印页眉同款：第一行 16px */
+    .print-shot .print-head .ph-t{font-size:25px}   /* 第二行“牵引力计算”25px，与打印一致 */
+    .print-shot table#tbl td,table#tbl input{font-size:15px}   /* 截图：单元格/输入框字号与前端一致 16px */
+    .print-shot table#tbl thead th{position:static;font-size:12px}   /* 截图：关闭表头 sticky（html2canvas 不支持，表头错位造成空隙）；表头文字 13px */
+        </style>
+    </head>
+    <body>
+    	<header id="标题栏1" class="mui-bar mui-bar-nav" style="background:#F7F7F7;">
+    		<a class="mui-icon mui-icon-left-nav mui-pull-left" style="color:#007AFF;"></a>
+    		<h1 class="mui-title" style="color:#0088FF;font-size:16px;font-weight:700;">牵引力计算</h1>
+    		<a class="mui-icon mui-icon-bars mui-pull-right" style="color:#007AFF;"></a>
+    	</header>
+    
+    	<style>
+    			.mui-bar-tab{background: #F7F7F7;}
+    			.mui-bar-tab .mui-tab-item{color: #8E8E8E;}
+    			.mui-bar-tab .mui-tab-item.mui-active{color: #007AFF;}
+    		</style>
+    		<nav id="导航栏1" class="mui-bar mui-bar-tab">
+    		</nav>
+		
+    <div class="mui-content" style="background-color:transparent;display:-webkit-flex;flex-direction:column;">
+      <div class="wrap">
+    	<div class="print-head" id="print-head"></div>
+    
+    <!-- ===== 基本参数 ===== -->
+    <section class="card" id="shot-card">
+      <div class="param-head">
+      <h2> 基本参数 </h2>
+      <div class="btnrow">	
+    	<button class="btn" id="btn-print">打印</button>
+    	<button class="btn" id="btn-reset">重置</button>
+        <button class="btn" id="btn-help">说明</button>
+      </div>
+      </div>
+      <div class="grid-params">    
+    	<div class="param"><label>杆塔数量</label><input id="p-n" type="text" inputmode="decimal" placeholder="数量 ≤50 基"></div>
+        <div class="param"><label>单导线米重</label><input id="p-w" type="text" inputmode="decimal" placeholder="单位kg/m"></div>
+        <div class="param"><label>牵引绳米重</label><input id="p-w0" type="text" inputmode="decimal" placeholder="单位kg/m"></div>
+        <div class="param"><label>导线根数</label><input id="p-m" type="text" inputmode="decimal" placeholder="单位/根"></div>
+        <div class="param"><label>摩擦系数</label><input id="p-eps" type="text" inputmode="decimal" placeholder="1.012~1.018"></div>
+        <div class="param"><label>制动张力</label><input id="p-tt" type="text" inputmode="decimal" placeholder="单位/吨"></div>
+      </div>
+    
+      <div class="k-ctl">
+        <span class="lbl">张力场</span>
+        <input id="k-range" type="range" min="1" max="21" step="1">
+    	<span id="k-lbl">（ N ）</span>
+    	<div class="r-item main"><div class="name">动态牵引力</div><div class="val" id="r-t">–</div></div>
+      </div>
+    
+    <!-- ===== 线档数据表 ===== -->
+      <h2 class="tbl-hd">塔基数据</h2>
+      <div class="table-wrap">
+        <table id="tbl" class="tbl">   
+          <colgroup>
+            <col class="c-type"><col class="c-num"><col class="c-li"><col class="c-mil"><col class="c-dh"><col class="c-tp">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>塔号</th><th>挂点高程<br>m</th><th>下一档距<br>m / 可空</th><th>累计里程<br>km</th><th>高差<br>Δh</th><th>牵引力<br>t</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-body"><!-- rows rendered by JS --></tbody>
+        </table>
+      </div>
+    </section>
+    
+    <!-- ===== 底部计算按钮（清除镂空 + 开始计算实心，并排） ===== -->
+    <div class="calc-bar">
+      <button id="btn-clear" type="button">清空</button>
+      <button id="btn-calc" type="button">开始计算</button>
+    </div>
+    
+    <!-- ===== 重置确认模态框 ===== -->
+    <div class="mask" id="mask" style="display:none">
+      <div class="modal">
+        <div class="modal-title">重置</div>
+        <div class="modal-msg">确定重置为示例数据吗？<br>将重置：杆塔、高程、档距等为示例等数据，并自动计算。</div>
+        <div class="modal-actions">
+          <button class="btn" id="modal-cancel">取 消</button>
+          <button class="btn primary" id="modal-ok">确 定</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== 软件说明模态框 ===== -->
+    <div class="mask" id="help-mask" style="display:none">
+      <div class="modal modal-help">
+        <div class="modal-title">软件说明</div>
+        <div class="modal-scroll">
+          <h4>一、功能</h4>
+          <b>本工具:</b>根据6项基本参数、挂点高程、档距，用于输电线路张力放线施工的<b> 牵引力 </b>计算，计算走板位于任意塔位时的放线牵引力、累计里程、高差等参考数据。
+		  <br><b>档距:</b>为非必要数据可输入<b> 0</b> 或 <b>空 </b>，用于计算里程做参考，软件最大支持50基计算，虽未必能用上，但宜多不宜少。
+		  <br><b>重置:</b>按钮被点击，会清空所有结果，按照默认示例进行计算并显示结果。
+		  <br>(已存储50基示例数据，可自行调整)
+          <h4>二、使用流程</h4>
+          <ul>
+            <li>1.输入基本参数：顶部6个参数框，进入页面仅“杆塔数量”有默认值，其余请自行填写</li>
+    		<li>2.输入杆塔数量后自动生成数据表，填写高程/档距后点击底部【计算】按钮出结果</li>
+    		<li>3.摩擦系数(导线/牵引绳:建议1.012~1.018,默认1.015)</li>        
+            <li>4.拖动进度条：即走板到达的塔位，塔号框显示蓝色 ✓</li>
+            <li>5.修改任一参数或数据后，点击底部【计算】按钮重新计算结果</li>
+    		<li>6.累计里程自张力场起逐档累加，以便掌握放线进程</li>
+            <li>7.清空可清空全部输入框数据（表格保留默认行数（桌面12基/移动8基））；重置可恢复示例数据并自动计算</li>
+    		<li>8.桌面端可直接打印成果/移动端只能截图保存成果</li>
+    	  </ul>
+          <h4>三、制动张力推荐值</h4>
+    	  <ul>
+    		<li> 导线型号，小高差常规---大高差三跨越</li>  
+    	    <li>240/30导线， 1.15t--------1.55t</li>
+    	    <li>300/40导线， 1.40t--------1.90t</li>
+    	    <li>400/35导线， 1.60t--------2.10t</li>
+    	    <li>450/50导线， 1.95t--------2.60t</li>
+    		<li>500/45导线， 1.95t--------2.60t</li>
+    	    <li>630/45导线， 2.15t--------2.90t</li>
+    		<li>以上数据仅作参考，计算时可根据情况自行调整</li>
+    	  </ul>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" id="help-close">关 闭</button>
+        </div>
+      </div>
+     </div>
+   </div>
+  </div>
+    
+<!-- ===== 云支付：弹出面板（微信支付二维码） ===== -->
+<div id="弹出面板1" class="mui-popover">
+  <div class="mui-scroll-wrapper">
+    <div class="mui-scroll">
+	  <label id="标签57" style="display:block;width:100%;color:#000000;font-size:14px;margin:0px 0px 0px 0px;padding:0px;text-align:center">牵引力计算需单独付费<br>微信支付码于10分钟后关闭</label>
+	  <div id="二维码1" style="margin-left:auto;margin-right:auto;padding:5px;"></div>      
+    </div>
+  </div>
+</div>
+
+  </body>
+    <script src="js/mui.min.js"></script>
+    <script src="gongyongmokuai.js"></script>
+    <script src="js/bluebird_math.js"></script>
+    <script src="js/bluebird_string.js"></script>
+    <script src="js/bluebird_localStorage.js"></script>
+    <script src="js/bluebird_window.js"></script>
+    <script src="js/bluebird_convert.js"></script>
+    <script src="js/bluebird_titleBar.js"></script>
+    <script src="js/bluebird_tabBar.js"></script>
+    <script src="js/bluebird_button.js"></script>
+    <script src="js/bluebird_dialogBox.js"></script>
+    <script src="js/bluebird_ajax.js"></script>
+    <script src="js/bluebird_timer.js"></script>
+    <script src="js/bluebird_pay.js"></script>
+    <script src="js/bluebird_popover.js"></script>
+    <script src="js/makeqrcode.js"></script>
+    <script src="js/qrcode.js"></script>
+    <script src="js/bluebird_screenshot.js"></script>
+    <script src="js/html2canvas.js"></script>
+    <script src="chuangkou37.js"></script>
+</html>

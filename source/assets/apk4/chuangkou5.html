@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>注册登录</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/icons-extra.css" rel="stylesheet"/>
+    <link rel="icon" href="favicon.png" type="images/x-ico" />
+    <style type="text/css">
+        body{background-color:#EFEFF4;}
+    </style>
+</head>
+<body>
+	<header id="标题栏1" class="mui-bar mui-bar-nav" style="background:#F7F7F7;">
+		<a class="mui-icon mui-icon-left-nav mui-pull-left" style="color:#007AFF;"></a>
+		<h1 class="mui-title" style="color:#0088FF;"></h1>
+		<a class="mui-icon mui-icon-bars mui-pull-right" style="color:#007AFF;"></a>
+	</header>
+
+	<style>
+		.mui-bar-tab{background: #F7F7F7;}
+		.mui-bar-tab .mui-tab-item{color: #8E8E8E;}
+		.mui-bar-tab .mui-tab-item.mui-active{color: #007AFF;}
+	</style>
+	<nav id="导航栏1" class="mui-bar mui-bar-tab">
+	</nav>
+
+	<div class="mui-content" style="background-color:transparent;display:-webkit-flex;flex-direction:column;display:none">
+
+		<div id="按钮组1" class="mui-input-row" style="margin:5px;display:-webkit-flex;text-align:center;">
+			<button id="0" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 0px;font-size:14px;">按钮0</button>
+			<button id="1" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">按钮1</button>
+			<button id="2" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">按钮2</button>
+		</div>
+
+		<div id="按钮组2" class="mui-input-row" style="margin:5px;display:-webkit-flex;text-align:center;">
+			<button id="0" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 0px;font-size:14px;">按钮0</button>
+			<button id="1" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">按钮1</button>
+			<button id="2" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">按钮2</button>
+		</div>
+
+		<div id="自由面板2" class="mui-input-row" tag="自由面板" style="margin:0px 0px 5px 0px;display:-webkit-flex;width:100%;height:210px;">
+			<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:7px;width:310px;height:200px;position:absolute;">
+			<textarea id="编辑框1" rows="8" placeholder="" style="color:#FF0000;font-size:14px;margin:0px 0px -5px 0px;"></textarea>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block;left:243px;top:10px;width:70px;height:70px;position:absolute;">
+			<img id="图片框1" style="width:100%;height:100%;" src="" />
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:243px;top:80px;width:70px;height:30px;position:absolute;">
+			<label id="标签2" style="width:100%;color:#0000FF;font-size:14px;margin:0px 0px 0px 0px;padding:0px;text-align:center"></label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:156px;width:310px;height:40px;position:absolute;">
+			<input id="编辑框3" type="text" class="mui-input-clear" placeholder="请输入密匙" style="color:#0000FF;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+		</div>
+<p id ="进度条1" class="mui-progressbar mui-progressbar-in" data-progress="0"><span></span></p>
+
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<textarea id="编辑框2" rows="2" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px -5px 0px;"></textarea>
+		</div>
+
+		<div id="按钮组4" class="mui-input-row" style="margin:5px;display:-webkit-flex;text-align:center;">
+			<button id="0" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 0px;font-size:14px;">按钮0</button>
+			<button id="1" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">按钮1</button>
+			<button id="2" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">按钮2</button>
+		</div>
+
+		<div id="按钮组3" class="mui-input-row" style="margin:5px;display:-webkit-flex;text-align:center;">
+			<button id="0" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 0px;font-size:13px;">分享到<br>朋友圈</button>
+			<button id="1" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:13px;">下载使<br>用说明</button>
+			<button id="2" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:13px;">多功能<br>工具网</button>
+			<button id="3" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:13px;">分享微<br>信好友</button>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block">
+			<img id="图片框2" style="width:97%;height:180px;" src="images/QQWX.png" />
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签1" style="width:100%;color:#000000;font-size:14px;margin:0px 0px 0px 0px;padding:0px;text-align:center">开发商：武侯区郅巍盛技术服务部</label>
+		</div>
+
+
+
+
+
+
+
+
+
+	</div>
+
+</body>
+<script src="js/mui.min.js"></script>
+<script src="gongyongmokuai.js"></script>
+<script src="js/bluebird_math.js"></script>
+<script src="js/bluebird_string.js"></script>
+<script src="js/bluebird_localStorage.js"></script>
+<script src="js/bluebird_window.js"></script>
+<script src="js/bluebird_convert.js"></script>
+<script src="js/bluebird_appcaozuo.js"></script>
+<script src="js/bluebird_titleBar.js"></script>
+<script src="js/bluebird_tabBar.js"></script>
+<script src="js/bluebird_buttonRow.js"></script>
+<script src="js/bluebird_freedomPanel.js"></script>
+<script src="js/bluebird_editBox.js"></script>
+<script src="js/bluebird_imageBox.js"></script>
+<script src="js/bluebird_lable.js"></script>
+<script src="js/bluebird_dialogBox.js"></script>
+<script src="js/bluebird_downloader.js"></script>
+<script src="js/bluebird_ajax.js"></script>
+<script src="js/bluebird_timer.js"></script>
+<script src="js/bluebird_WXLogin.js"></script>
+<script src="js/bluebird_WXShare.js"></script>
+<script src="js/bluebird_progressbar.js"></script>
+<script src="js/bluebird_encrypt.js"></script>
+<script src="js/bluebird_jiami.js"></script>
+<script src="js/bluebird_pay.js"></script>
+<script src="chuangkou5.js"></script>
+</html>

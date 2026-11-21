@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>模板角钢反坡</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/icons-extra.css" rel="stylesheet"/>
+    <link rel="icon" href="favicon.png" type="images/x-ico" />
+    <style type="text/css">
+        body{background-color:#EFEFF4;}
+    </style>
+	<style>
+        .mui-radio input[type='radio']:checked:before, .mui-checkbox input[type='checkbox']:checked:before
+        {
+            color: #007AFF;
+        }        
+	</style>
+</head>
+<body>
+	<header id="标题栏1" class="mui-bar mui-bar-nav" style="background:#F7F7F7;">
+		<a class="mui-icon mui-icon-left-nav mui-pull-left" style="color:#007AFF;"></a>
+		<h1 class="mui-title" style="color:#0088FF;"></h1>
+		<a class="mui-icon mui-icon-bars mui-pull-right" style="color:#007AFF;"></a>
+	</header>
+
+	<style>
+		.mui-bar-tab{background: #F7F7F7;}
+		.mui-bar-tab .mui-tab-item{color: #8E8E8E;}
+		.mui-bar-tab .mui-tab-item.mui-active{color: #007AFF;}
+	</style>
+	<nav id="导航栏1" class="mui-bar mui-bar-tab">
+	</nav>
+
+	<div class="mui-content" style="background-color:transparent;display:-webkit-flex;flex-direction:column;display:none">
+<div id="面板1" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div id="单选框1" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>模板<br>制作</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框2" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>坡度<br>反算</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框3" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>角钢直<br>高平距</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="自由面板1" class="mui-input-row" tag="自由面板" style="margin:0px 0px 5px 0px;display:-webkit-flex;width:100%;height:355px;">
+		<div class="mui-input-row" style="margin:0px;display:block;left:6px;top:147px;width:154px;height:16px;position:absolute;">
+			<label id="标签1" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">单坡</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:135px;width:111px;height:40px;position:absolute;">
+			<input id="编辑框1" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:6px;top:188px;width:154px;height:16px;position:absolute;">
+			<label id="标签2" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">基础全高</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:176px;width:111px;height:40px;position:absolute;">
+			<input id="编辑框2" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:4px;top:229px;width:154px;height:16px;position:absolute;">
+			<label id="标签3" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">立柱断面</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:217px;width:111px;height:40px;position:absolute;">
+			<input id="编辑框3" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:258px;width:111px;height:40px;position:absolute;">
+			<input id="编辑框4" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:6px;top:269px;width:154px;height:18px;position:absolute;">
+			<label id="标签4" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">底盘高度</label>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:165px;top:310px;width:150px;height:40px;position:absolute;">
+			<button id="按钮1" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">开始计算</button>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:3px;top:25px;width:160px;height:20px;position:absolute;">
+			<label id="标签9" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">斜率(mm)</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:25px;width:160px;height:20px;position:absolute;">
+			<label id="标签10" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">模板长度：加长80(mm)</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:277px;top:147px;width:20px;height:16px;position:absolute;">
+			<label id="标签12" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">p</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:277px;top:188px;width:20px;height:16px;position:absolute;">
+			<label id="标签13" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">mm</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:276px;top:229px;width:20px;height:16px;position:absolute;">
+			<label id="标签14" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">mm</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:275px;top:270px;width:20px;height:16px;position:absolute;">
+			<label id="标签15" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">mm</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:3px;top:45px;width:160px;height:20px;position:absolute;">
+			<label id="标签5" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:156px;top:45px;width:160px;height:20px;position:absolute;">
+			<label id="标签6" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:-1px;top:75px;width:160px;height:16px;position:absolute;">
+			<label id="标签7" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">角钢直高(mm)</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:3px;top:100px;width:160px;height:20px;position:absolute;">
+			<label id="标签8" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:158px;top:75px;width:160px;height:16px;position:absolute;">
+			<label id="标签11" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">带十字板直高(mm)</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:155px;top:100px;width:160px;height:20px;position:absolute;">
+			<label id="标签16" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:310px;width:150px;height:40px;position:absolute;">
+			<button id="按钮2" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">清除数据</button>
+		</div>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block">
+			<img id="图片框1" style="width:100%;height:240px;" src="images/MBZZ.png" />
+		</div>
+
+	</div>
+
+</body>
+<script src="js/mui.min.js"></script>
+<script src="gongyongmokuai.js"></script>
+<script src="js/bluebird_math.js"></script>
+<script src="js/bluebird_string.js"></script>
+<script src="js/bluebird_localStorage.js"></script>
+<script src="js/bluebird_window.js"></script>
+<script src="js/bluebird_convert.js"></script>
+<script src="js/bluebird_titleBar.js"></script>
+<script src="js/bluebird_tabBar.js"></script>
+<script src="js/bluebird_radio.js"></script>
+<script src="js/bluebird_freedomPanel.js"></script>
+<script src="js/bluebird_lable.js"></script>
+<script src="js/bluebird_editBox.js"></script>
+<script src="js/bluebird_button.js"></script>
+<script src="js/bluebird_imageBox.js"></script>
+<script src="js/bluebird_dialogBox.js"></script>
+<script src="js/bluebird_panel.js"></script>
+<script src="chuangkou11.js"></script>
+</html>

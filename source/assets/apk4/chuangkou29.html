@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>三分裂引流计算</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/icons-extra.css" rel="stylesheet"/>
+    <link rel="icon" href="favicon.png" type="images/x-ico" />
+	<link href="css/table_td.css" rel="stylesheet"/>
+    <style type="text/css">
+        body{background-color:#EFEFF4;}
+    </style>
+	<style>
+        .mui-radio input[type='radio']:checked:before, .mui-checkbox input[type='checkbox']:checked:before
+        {
+            color: #007AFF;
+        }        
+	</style>
+<style>
+    body {
+        margin: 0;
+    }
+
+    #info {
+        font-size: 18px;
+        font-weight: bold;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        padding: 5px;
+        text-align: center;
+        cursor: pointer;
+        box-sizing: border-box;
+        z-index: 1001;
+        display: none;
+        color: white; /* 文字填充白色 */
+        text-shadow: 1px 1px 0 blue, 1px 1px 0 blue, 1px 1px 0 blue, 1px 1px 0 blue;/* 文字边框为蓝色 */
+    }
+
+    #info > a {
+        color: white;
+        text-decoration: none;
+        text-shadow: 1px 1px 0 blue, 1px 1px 0 blue, 1px 1px 0 blue, 1px 1px 0 blue;
+    }
+
+    #info1 {
+        font-size: 20px;
+        font-weight: bold;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        padding: 25px;
+        text-align: center;
+        cursor: pointer;
+        box-sizing: border-box;
+        z-index: 1001;
+        display: none;
+        color: white;
+        text-shadow: 1px 1px 0 blue, 1px 1px 0 blue, 1px 1px 0 blue, 1px 1px 0 blue;
+    }
+
+    #info1 > a {
+        color: white;
+        text-decoration: none;
+        text-shadow: 1px 1px 0 blue, 1px 1px 0 blue, 1px 1px 0 blue, 1px 1px 0 blue;
+    }
+
+    #left {
+        font-size: 14px;
+        font-weight: bold;
+        position: fixed;
+        top: 0;
+        left: 5px;
+        padding: 5px;
+        cursor: pointer;
+        box-sizing: border-box;
+        z-index: 1001;
+        display: none;
+        color: white;
+        text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+    }
+
+    #left > a {
+        color: white;
+        text-decoration: none;
+        text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+    }
+
+    #right {
+        font-size: 14px;
+        font-weight: bold;
+        position: fixed;
+        top: 0;
+        right: 5px;
+        padding: 5px;
+        cursor: pointer;
+        box-sizing: border-box;
+        z-index: 1001;
+        display: none;
+        color: white;
+        text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+    }
+
+    #right > a {
+        color: white;
+        text-decoration: none;
+        text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+    }
+#dqjlg {
+    font-size: 14px;
+    font-weight: bold;
+    position: fixed;
+    top: 30px; /* 修改为 50px */
+    left: 5px;
+    padding: 5px;
+    cursor: pointer;
+    box-sizing: border-box;
+    z-index: 1001;
+    display: none;
+    color: white;
+    text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+}
+
+#dqjlg > a {
+    color: white;
+    text-decoration: none;
+    text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+}
+
+#dqjlk {
+    font-size: 14px;
+    font-weight: bold;
+    position: fixed;
+    top: 30px; /* 修改为 50px */
+    right: 5px;
+    padding: 5px;
+    cursor: pointer;
+    box-sizing: border-box;
+    z-index: 1001;
+    display: none;
+    color: white;
+    text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+}
+
+#dqjlk > a {
+    color: white;
+    text-decoration: none;
+    text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+}
+  
+    #zxgd {
+    font-size: 14px;
+    font-weight: bold;
+    position: fixed;
+    bottom: 0; /* 从顶部改为底部 */
+    left: 5px;
+    padding: 10px 10px 25px 5px;
+    cursor: pointer;
+    box-sizing: border-box;
+    z-index: 1001;
+    display: none;
+    color: white;
+    text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+    }
+
+    #zxgd > a {
+    color: white;
+    text-decoration: none;
+    text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+    }
+
+    #yxgd {
+    font-size: 14px;
+    font-weight: bold;
+    position: fixed;
+    bottom: 0; /* 从顶部改为底部 */
+    right: 5px;
+    padding: 10px 5px 25px 10px;
+    cursor: pointer;
+    box-sizing: border-box;
+    z-index: 1001;
+    display: none;
+    color: white;
+    text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+    }
+
+    #yxgd > a {
+    color: white;
+    text-decoration: none;
+    text-shadow: 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red, 1px 1px 0 red;
+    }
+
+    canvas {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+    }
+</style>
+
+</head>
+<body>
+	<header id="标题栏1" class="mui-bar mui-bar-nav" style="background:#F7F7F7;">
+		<a class="mui-icon mui-icon-left-nav mui-pull-left" style="color:#007AFF;"></a>
+		<h1 class="mui-title" style="color:#0088FF;">三分裂引流计算</h1>
+		<a class="mui-icon mui-icon-bars mui-pull-right" style="color:#007AFF;"></a>
+	</header>
+
+	<style>
+		.mui-bar-tab{background: #F7F7F7;}
+		.mui-bar-tab .mui-tab-item{color: #8E8E8E;}
+		.mui-bar-tab .mui-tab-item.mui-active{color: #007AFF;}
+	</style>
+	<nav id="导航栏1" class="mui-bar mui-bar-tab">
+	</nav>
+
+	<div class="mui-content" style="background-color:transparent;display:-webkit-flex;flex-direction:column;display:none">
+<div id="面板1" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+<div id="面板2" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+<div id="面板3" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+<div id="面板4" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div id="单选框2" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>平视弧垂</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框1" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>中点弧垂</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框3" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>硬跳</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框4" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>软跳</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框6" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>左转</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框5" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>右转</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框7" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>普通塔型</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框8" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>分支,终端,换位</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="自由面板2" class="mui-input-row" tag="自由面板" style="margin:0px 0px 5px 0px;display:-webkit-flex;width:100%;height:1125px;">
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:137px;width:320px;height:18px;position:absolute;">
+			<label id="标签1" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">小号瓷瓶串长</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:247px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框1" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:213px;width:320px;height:18px;position:absolute;">
+			<label id="标签3" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">大号瓷瓶串长</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:40px;top:247px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框2" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:80px;top:247px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框3" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:96px;top:368px;width:42px;height:40px;position:absolute;">
+			<input id="编辑框5" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:380px;width:80px;height:16px;position:absolute;">
+			<label id="标签5" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">小号角度</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:139px;top:371px;width:15px;height:16px;position:absolute;">
+			<label id="标签6" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">°</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:205px;top:371px;width:19px;height:16px;position:absolute;">
+			<label id="标签7" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">′</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:271px;top:371px;width:33px;height:16px;position:absolute;">
+			<label id="标签8" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">″</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:153px;top:368px;width:43px;height:40px;position:absolute;">
+			<input id="编辑框6" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:462px;width:140px;height:16px;position:absolute;">
+			<label id="标签9" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">横担宽度</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:462px;width:40px;height:16px;position:absolute;">
+			<label id="标签10" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:224px;top:368px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框7" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:450px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框8" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:491px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框9" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:532px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框10" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:503px;width:140px;height:16px;position:absolute;">
+			<label id="标签11" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">小号瓷瓶倾角</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:493px;width:40px;height:16px;position:absolute;">
+			<label id="标签12" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">°</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:544px;width:140px;height:16px;position:absolute;">
+			<label id="标签13" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">大号瓷瓶倾角</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:534px;width:40px;height:16px;position:absolute;">
+			<label id="标签14" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">°</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:585px;width:140px;height:16px;position:absolute;">
+			<label id="标签15" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">引流把长度(主线端)</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:585px;width:40px;height:16px;position:absolute;">
+			<label id="标签16" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:699px;width:110px;height:35px;position:absolute;">
+			<label id="标签17" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">挂点到跳线串<br>水平距离</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:708px;width:40px;height:16px;position:absolute;">
+			<label id="标签18" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:573px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框11" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:696px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框12" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:85px;top:614px;width:55px;height:40px;position:absolute;">
+			<input id="编辑框13" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:626px;width:80px;height:16px;position:absolute;">
+			<label id="标签19" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">平视弧垂</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:140px;top:626px;width:20px;height:16px;position:absolute;">
+			<label id="标签20" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">f1</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:215px;top:626px;width:20px;height:16px;position:absolute;">
+			<label id="标签21" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">f0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:290px;top:626px;width:20px;height:16px;position:absolute;">
+			<label id="标签22" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">f2</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:614px;width:55px;height:40px;position:absolute;">
+			<input id="编辑框14" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:740px;width:110px;height:35px;position:absolute;">
+			<label id="标签23" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">瓷瓶挂点到引<br>流挂点高度</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:749px;width:40px;height:16px;position:absolute;">
+			<label id="标签24" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:235px;top:614px;width:55px;height:40px;position:absolute;">
+			<input id="编辑框15" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:790px;width:86px;height:16px;position:absolute;">
+			<label id="标签25" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">跳串高度</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:790px;width:40px;height:16px;position:absolute;">
+			<label id="标签26" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:737px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框16" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:831px;width:140px;height:16px;position:absolute;">
+			<label id="标签27" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">钢管两端握手长度</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:778px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框17" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:831px;width:40px;height:16px;position:absolute;">
+			<label id="标签28" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:667px;width:140px;height:16px;position:absolute;">
+			<label id="标签29" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">主线分裂直径</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:667px;width:40px;height:16px;position:absolute;">
+			<label id="标签30" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:11px;width:80px;height:16px;position:absolute;">
+			<label id="标签31" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">1#总线长</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:81px;top:11px;width:80px;height:16px;position:absolute;">
+			<label id="标签32" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">2#总线长</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:10px;width:80px;height:16px;position:absolute;">
+			<label id="标签33" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">3#总线长</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:26px;width:80px;height:20px;position:absolute;">
+			<label id="标签34" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:79px;top:26px;width:80px;height:20px;position:absolute;">
+			<label id="标签35" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:26px;width:80px;height:20px;position:absolute;">
+			<label id="标签36" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:819px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框18" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:655px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框19" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:171px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框20" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:40px;top:171px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框21" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:80px;top:171px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框22" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:231px;width:40px;height:16px;position:absolute;">
+			<label id="标签2" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">1#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:40px;top:231px;width:40px;height:16px;position:absolute;">
+			<label id="标签4" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">2#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:80px;top:231px;width:40px;height:16px;position:absolute;">
+			<label id="标签43" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">3#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:155px;width:40px;height:16px;position:absolute;">
+			<label id="标签53" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">1#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:40px;top:155px;width:40px;height:16px;position:absolute;">
+			<label id="标签54" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">2#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:80px;top:155px;width:40px;height:16px;position:absolute;">
+			<label id="标签55" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">3#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:872px;width:140px;height:16px;position:absolute;">
+			<label id="标签61" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">引流分裂直径</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:860px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框32" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:872px;width:40px;height:16px;position:absolute;">
+			<label id="标签62" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:901px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框33" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:913px;width:140px;height:16px;position:absolute;">
+			<label id="标签91" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">引流管长度(引流端)</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:913px;width:40px;height:16px;position:absolute;">
+			<label id="标签92" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:94px;width:100px;height:40px;position:absolute;">
+			<input id="编辑框35" type="text" class="mui-input-clear" placeholder="可备注名称" style="color:#FF0000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:419px;width:80px;height:16px;position:absolute;">
+			<label id="标签100" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">大号角度</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:96px;top:409px;width:42px;height:40px;position:absolute;">
+			<input id="编辑框36" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:155px;top:409px;width:44px;height:40px;position:absolute;">
+			<input id="编辑框37" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:221px;top:409px;width:42px;height:40px;position:absolute;">
+			<input id="编辑框38" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:139px;top:412px;width:20px;height:16px;position:absolute;">
+			<label id="标签101" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">°</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:198px;top:412px;width:20px;height:16px;position:absolute;">
+			<label id="标签102" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">′</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:263px;top:412px;width:20px;height:16px;position:absolute;">
+			<label id="标签103" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">″</label>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:115px;top:538px;width:40px;height:30px;position:absolute;">
+			<button id="按钮1" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:12px;">带值</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:115px;top:497px;width:40px;height:30px;position:absolute;">
+			<button id="按钮2" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:12px;">计算</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:115px;top:702px;width:40px;height:30px;position:absolute;">
+			<button id="按钮3" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:12px;">计算</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:115px;top:743px;width:40px;height:30px;position:absolute;">
+			<button id="按钮4" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:12px;">带值</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:85px;top:50px;width:160px;height:40px;position:absolute;">
+			<button id="按钮5" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">排列模式</button>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:324px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框39" type="number" class="mui-input-clear" placeholder="" style="color:#0088FF;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:290px;width:320px;height:18px;position:absolute;">
+			<label id="标签123" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">大、小号-引流把角度</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:308px;width:40px;height:16px;position:absolute;">
+			<label id="标签124" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">1#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:40px;top:308px;width:40px;height:16px;position:absolute;">
+			<label id="标签125" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">2#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:80px;top:308px;width:40px;height:16px;position:absolute;">
+			<label id="标签126" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">3#</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:40px;top:324px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框40" type="number" class="mui-input-clear" placeholder="" style="color:#0088FF;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:79px;top:324px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框41" type="number" class="mui-input-clear" placeholder="" style="color:#0088FF;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:942px;width:110px;height:40px;position:absolute;">
+			<input id="编辑框34" type="number" class="mui-input-clear" placeholder="" style="color:#0088FF;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:954px;width:153px;height:16px;position:absolute;">
+			<label id="标签93" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">钢管中心偏移距离</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:954px;width:40px;height:16px;position:absolute;">
+			<label id="标签94" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+		<div class="mui-input-row mui-select" style="margin:0px;display:block;left:215px;top:95px;width:100px;height:40px;position:absolute;">
+			<select id="下拉框1" style="width:100%;margin:0px 0px 0px 0px;padding-left:5px;font-size:14px;"></select>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:110px;top:94px;width:100px;height:40px;position:absolute;">
+			<button id="按钮6" type="button" class="mui-btn mui-btn-success" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">导入表格</button>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:1036px;width:143px;height:16px;position:absolute;">
+			<label id="标签37" style="width:100%;color:#0088FF;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">大号位移距离(换位)</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:1077px;width:145px;height:16px;position:absolute;">
+			<label id="标签38" style="width:100%;color:#0088FF;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">大号位移高度(换位)</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:161px;top:1024px;width:108px;height:40px;position:absolute;">
+			<input id="编辑框4" type="number" class="mui-input-clear" placeholder="" style="color:#0088FF;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:161px;top:1065px;width:107px;height:40px;position:absolute;">
+			<input id="编辑框23" type="number" class="mui-input-clear" placeholder="" style="color:#0088FF;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:272px;top:1036px;width:34px;height:16px;position:absolute;">
+			<label id="标签39" style="width:100%;color:#0088FF;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:272px;top:1077px;width:39px;height:16px;position:absolute;">
+			<label id="标签40" style="width:100%;color:#0088FF;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+		<div class="mui-input-row mui-select" style="margin:0px;display:block;left:115px;top:778px;width:40px;height:40px;position:absolute;">
+			<select id="下拉框2" style="width:100%;margin:0px 0px 0px 0px;padding-left:5px;font-size:14px;"></select>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:5px;top:995px;width:120px;height:16px;position:absolute;">
+			<label id="标签41" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">(1,2)间隔棒距离</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:280px;top:995px;width:40px;height:16px;position:absolute;">
+			<label id="标签42" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">m</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:983px;width:55px;height:40px;position:absolute;">
+			<input id="编辑框24" type="number" class="mui-input-clear" placeholder="1.8" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:215px;top:983px;width:55px;height:40px;position:absolute;">
+			<input id="编辑框25" type="number" class="mui-input-clear" placeholder="3" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+		</div>
+
+		<div id="按钮组2" class="mui-input-row" style="margin:5px;display:-webkit-flex;text-align:center;">
+			<button id="0" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 0px;font-size:14px;">清除数据</button>
+			<button id="1" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">模拟图</button>
+			<button id="2" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">详细</button>
+		</div>
+
+		<div id="按钮组1" class="mui-input-row" style="margin:5px;display:-webkit-flex;text-align:center;">
+			<button id="0" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 0px;font-size:14px;">打开表格</button>
+			<button id="1" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">导出表格</button>
+			<button id="2" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">关闭表格</button>
+		</div>
+<table border="1" style="width:100%;background:#fff;text-align:center;font-size:14px;" id="加强表格1"></table>
+
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签89" style="width:100%;color:#FF0000;font-size:12px;margin:0px 0px 0px 0px;padding:0px;text-align:center">注:线序必须根据下图所示意线序输入串长。<br>3分裂引流，默认为等边三角形排列模式。<br>(1,2)间隔棒距离<br>硬跳时1为第一个距离，2为线夹回量距离<br>软跳时1为第一个距离，2为弧垂点回量距离</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block">
+			<img id="图片框1" style="width:55%;height:180px;" src="images/3FL2.png" />
+		</div>
+
+<div id="弹出面板1" class="mui-popover">
+            <div class="mui-scroll-wrapper">
+                <div class="mui-scroll">
+                    
+                </div>
+            </div>
+        </div>
+
+
+		<div id="自由面板1" class="mui-input-row" tag="自由面板" style="margin:0px 0px 5px 0px;display:-webkit-flex;width:100%;height:215px;">
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:120px;width:40px;height:20px;position:absolute;">
+			<label id="标签63" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">1#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:150px;width:40px;height:20px;position:absolute;">
+			<label id="标签64" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">2#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:180px;width:40px;height:20px;position:absolute;">
+			<label id="标签65" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">3#</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:40px;top:95px;width:70px;height:20px;position:absolute;">
+			<label id="标签71" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">小号线长</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:180px;top:95px;width:70px;height:20px;position:absolute;">
+			<label id="标签72" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">大号线长</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:40px;top:120px;width:70px;height:20px;position:absolute;">
+			<label id="标签73" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:40px;top:150px;width:70px;height:20px;position:absolute;">
+			<label id="标签74" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:40px;top:180px;width:70px;height:20px;position:absolute;">
+			<label id="标签75" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:180px;top:120px;width:70px;height:20px;position:absolute;">
+			<label id="标签81" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:180px;top:150px;width:70px;height:20px;position:absolute;">
+			<label id="标签82" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:180px;top:180px;width:70px;height:20px;position:absolute;">
+			<label id="标签83" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:5px;width:320px;height:40px;position:absolute;">
+			<label id="标签90" style="width:100%;color:#FF0000;font-size:14px;margin:0px 0px 0px 0px;padding:0px;text-align:center">注：</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:95px;width:40px;height:20px;position:absolute;">
+			<label id="标签95" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">线号</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:46px;width:160px;height:20px;position:absolute;">
+			<label id="标签96" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">小号中点弧垂</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:45px;width:160px;height:20px;position:absolute;">
+			<label id="标签97" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">大号中点弧垂</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:65px;width:160px;height:20px;position:absolute;">
+			<label id="标签98" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:160px;top:66px;width:160px;height:20px;position:absolute;">
+			<label id="标签99" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:110px;top:95px;width:70px;height:20px;position:absolute;">
+			<label id="标签104" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">中段线长</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:110px;top:120px;width:70px;height:20px;position:absolute;">
+			<label id="标签105" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:110px;top:150px;width:70px;height:20px;position:absolute;">
+			<label id="标签106" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:110px;top:180px;width:70px;height:20px;position:absolute;">
+			<label id="标签107" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:250px;top:95px;width:70px;height:20px;position:absolute;">
+			<label id="标签114" style="width:100%;color:#000000;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">总长</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:250px;top:120px;width:70px;height:20px;position:absolute;">
+			<label id="标签115" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:250px;top:150px;width:70px;height:20px;position:absolute;">
+			<label id="标签116" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:250px;top:179px;width:70px;height:20px;position:absolute;">
+			<label id="标签117" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+		</div>
+
+
+
+<div id="弹出面板2" class="mui-popover">
+            <div class="mui-scroll-wrapper">
+                <div class="mui-scroll">
+                    
+                </div>
+            </div>
+        </div>
+
+<div id="二维码1" style="margin-left:auto;margin-right:auto;padding:5px;"></div>
+
+
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签113" style="width:100%;color:#000000;font-size:14px;margin:0px 0px 0px 0px;padding:0px;text-align:center">引流计算需单独付费<br>微信支付码于10分钟后关闭</label>
+		</div>
+
+
+
+
+<input type="file" id="文件选择器1" style="display:none;">
+
+  <div id="三维绘图增强1" style="width:100%;height:0px">
+
+<div id="info">
+<a id="viewFront">正视图 </a>
+<a id="viewTop">| 俯视图 </a>
+<a id="viewRight">| 右视图</a>     
+</div>
+
+<div id="info1">
+<a id="gb" >关闭图形 </a>
+<a id="ksjs">| 开始计算</a> 
+</div>
+
+<div id="dqjlg">
+<a id="dqg">电气关闭</a>
+</div>
+
+<div id="dqjlk">
+<a id="dqk">电气开启</a>
+</div>
+
+<div id="left">
+<a id="blck">比例尺关</a>
+</div>
+
+<div id="right">
+<a id="blcg">比例尺开</a>
+</div>
+
+<div id="zxgd">
+<a id="zxgdwz">左项挂设</a>
+</div>
+
+<div id="yxgd">
+<a id="yxgdwz">右项挂设</a>
+</div>
+
+</div>
+
+<script>
+function swit() { 相机对象.position.set(0, 0, 5000); 相机对象.lookAt(new THREE.Vector3(0, 0, 0));}
+var view = document.getElementById("viewFront");view.addEventListener("click", swit)
+function swit1() { 相机对象.position.set(0, 5000, 0); 相机对象.lookAt(new THREE.Vector3(0, 0, 0));}
+var view1 = document.getElementById("viewTop");view1.addEventListener("click", swit1)
+function swit2() { 相机对象.position.set(5000, 0, 0); 相机对象.lookAt(new THREE.Vector3(0, 0, 0));}
+var view2 = document.getElementById("viewRight");view2.addEventListener("click", swit2)
+</script>
+
+	</div>
+
+</body>
+<script src="js/mui.min.js"></script>
+<script src="gongyongmokuai.js"></script>
+<script src="js/bluebird_math.js"></script>
+<script src="js/bluebird_string.js"></script>
+<script src="js/bluebird_array.js"></script>
+<script src="js/bluebird_localStorage.js"></script>
+<script src="js/bluebird_window.js"></script>
+<script src="js/bluebird_convert.js"></script>
+<script src="js/bluebird_date.js"></script>
+<script src="js/bluebird_titleBar.js"></script>
+<script src="js/bluebird_tabBar.js"></script>
+<script src="js/bluebird_radio.js"></script>
+<script src="js/bluebird_freedomPanel.js"></script>
+<script src="js/bluebird_lable.js"></script>
+<script src="js/bluebird_editBox.js"></script>
+<script src="js/bluebird_buttonRow.js"></script>
+<script src="js/bluebird_imageBox.js"></script>
+<script src="js/bluebird_dialogBox.js"></script>
+<script src="js/bluebird_ajax.js"></script>
+<script src="js/bluebird_timer.js"></script>
+<script src="js/bluebird_button.js"></script>
+<script src="js/bluebird_xialakuang.js"></script>
+<script src="js/bluebird_panel.js"></script>
+<script src="js/table_td.js"></script>
+<script src="js/xlsx-0.17.4.js"></script>
+<script src="js/bluebird_popover.js"></script>
+<script src="js/bluebird_pay.js"></script>
+<script src="js/bluebird_screenshot.js"></script>
+<script src="js/html2canvas.js"></script>
+<script src="js/makeqrcode.js"></script>
+<script src="js/qrcode.js"></script>
+<script src="js/bluebird_fileselect.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="js/three.js"></script>
+<script src="js/threecamerass.js"></script>
+<script src="chuangkou29.js"></script>
+</html>

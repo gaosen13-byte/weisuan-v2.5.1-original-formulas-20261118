@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>编辑公式</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/icons-extra.css" rel="stylesheet"/>
+    <link rel="icon" href="favicon.png" type="images/x-ico" />
+    <style type="text/css">
+        body{background-color:#EFEFF4;}
+    </style>
+</head>
+<body>
+	<header id="标题栏1" class="mui-bar mui-bar-nav" style="background:#F7F7F7;">
+		<a class="mui-icon mui-icon-left-nav mui-pull-left" style="color:#007AFF;"></a>
+		<h1 class="mui-title" style="color:#0088FF;">编辑公式</h1>
+		<a class="mui-icon mui-icon-bars mui-pull-right" style="color:#007AFF;"></a>
+	</header>
+
+	<style>
+		.mui-bar-tab{background: #F7F7F7;}
+		.mui-bar-tab .mui-tab-item{color: #8E8E8E;}
+		.mui-bar-tab .mui-tab-item.mui-active{color: #007AFF;}
+	</style>
+	<nav id="导航栏1" class="mui-bar mui-bar-tab">
+	</nav>
+
+	<div class="mui-content" style="background-color:transparent;display:-webkit-flex;flex-direction:column;display:none">
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<textarea id="编辑框1" rows="8" placeholder="请编辑公式" style="color:#000000;font-size:14px;margin:0px 0px -5px 0px;"></textarea>
+		</div>
+
+		<div id="自由面板1" class="mui-input-row" tag="自由面板" style="margin:0px 0px 5px 0px;display:-webkit-flex;width:100%;height:505px;">
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:100px;width:48px;height:30px;position:absolute;">
+			<button id="按钮1" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">A</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:58px;top:100px;width:48px;height:30px;position:absolute;">
+			<button id="按钮2" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">B</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:110px;top:100px;width:48px;height:30px;position:absolute;">
+			<button id="按钮3" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">C</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:162px;top:100px;width:48px;height:30px;position:absolute;">
+			<button id="按钮4" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">D</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:214px;top:100px;width:48px;height:30px;position:absolute;">
+			<button id="按钮5" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">E</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:266px;top:100px;width:48px;height:30px;position:absolute;">
+			<button id="按钮6" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">F</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:135px;width:48px;height:30px;position:absolute;">
+			<button id="按钮7" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">G</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:58px;top:135px;width:48px;height:30px;position:absolute;">
+			<button id="按钮8" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">H</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:110px;top:135px;width:48px;height:30px;position:absolute;">
+			<button id="按钮9" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">I</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:162px;top:135px;width:48px;height:30px;position:absolute;">
+			<button id="按钮10" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">J</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:214px;top:135px;width:48px;height:30px;position:absolute;">
+			<button id="按钮11" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">K</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:266px;top:135px;width:48px;height:30px;position:absolute;">
+			<button id="按钮12" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">L</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:170px;width:48px;height:30px;position:absolute;">
+			<button id="按钮13" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">M</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:58px;top:170px;width:48px;height:30px;position:absolute;">
+			<button id="按钮14" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">N</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:110px;top:170px;width:48px;height:30px;position:absolute;">
+			<button id="按钮15" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">O</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:162px;top:170px;width:48px;height:30px;position:absolute;">
+			<button id="按钮16" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">P</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:214px;top:170px;width:48px;height:30px;position:absolute;">
+			<button id="按钮17" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">Q</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:266px;top:170px;width:48px;height:30px;position:absolute;">
+			<button id="按钮18" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">R</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:205px;width:48px;height:30px;position:absolute;">
+			<button id="按钮19" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">S</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:58px;top:205px;width:48px;height:30px;position:absolute;">
+			<button id="按钮20" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">T</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:110px;top:205px;width:48px;height:30px;position:absolute;">
+			<button id="按钮21" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">U</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:162px;top:205px;width:48px;height:30px;position:absolute;">
+			<button id="按钮22" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">V</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:214px;top:205px;width:48px;height:30px;position:absolute;">
+			<button id="按钮23" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">W</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:266px;top:205px;width:48px;height:30px;position:absolute;">
+			<button id="按钮24" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">X</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:240px;width:48px;height:30px;position:absolute;">
+			<button id="按钮25" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">Y</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:58px;top:240px;width:48px;height:30px;position:absolute;">
+			<button id="按钮26" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">Z</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:320px;width:48px;height:40px;position:absolute;">
+			<button id="按钮27" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">(</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:266px;top:320px;width:48px;height:40px;position:absolute;">
+			<button id="按钮28" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">)</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:214px;top:240px;width:48px;height:30px;position:absolute;">
+			<button id="按钮29" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:20px;">^</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:266px;top:239px;width:48px;height:30px;position:absolute;">
+			<button id="按钮30" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">π</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:275px;width:48px;height:40px;position:absolute;">
+			<button id="按钮31" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">sin</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:58px;top:275px;width:48px;height:40px;position:absolute;">
+			<button id="按钮32" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">cos</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:110px;top:275px;width:48px;height:40px;position:absolute;">
+			<button id="按钮33" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">tan</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:110px;top:240px;width:48px;height:30px;position:absolute;">
+			<button id="按钮34" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">3√&oline;</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:162px;top:240px;width:48px;height:30px;position:absolute;">
+			<button id="按钮35" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">2√&oline;</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:162px;top:275px;width:48px;height:40px;position:absolute;">
+			<button id="按钮36" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">sin&macr;&#185</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:214px;top:275px;width:48px;height:40px;position:absolute;">
+			<button id="按钮37" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">cos&macr;&#185</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:266px;top:275px;width:48px;height:40px;position:absolute;">
+			<button id="按钮38" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">tan&macr;&#185</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:266px;top:365px;width:48px;height:40px;position:absolute;">
+			<button id="按钮39" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:20px;">.</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:365px;width:48px;height:40px;position:absolute;">
+			<button id="按钮40" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">0</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:58px;top:320px;width:48px;height:40px;position:absolute;">
+			<button id="按钮41" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">+</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:110px;top:320px;width:48px;height:40px;position:absolute;">
+			<button id="按钮42" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">-</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:162px;top:320px;width:48px;height:40px;position:absolute;">
+			<button id="按钮43" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">×</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:214px;top:320px;width:48px;height:40px;position:absolute;">
+			<button id="按钮44" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">÷</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:58px;top:365px;width:48px;height:40px;position:absolute;">
+			<button id="按钮45" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">1</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:110px;top:365px;width:48px;height:40px;position:absolute;">
+			<button id="按钮46" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">2</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:162px;top:365px;width:48px;height:40px;position:absolute;">
+			<button id="按钮47" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">3</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:214px;top:365px;width:48px;height:40px;position:absolute;">
+			<button id="按钮48" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">4</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:410px;width:48px;height:40px;position:absolute;">
+			<button id="按钮49" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">5</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:58px;top:410px;width:48px;height:40px;position:absolute;">
+			<button id="按钮50" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">6</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:110px;top:410px;width:48px;height:40px;position:absolute;">
+			<button id="按钮51" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">7</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:162px;top:410px;width:48px;height:40px;position:absolute;">
+			<button id="按钮52" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">8</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:214px;top:410px;width:48px;height:40px;position:absolute;">
+			<button id="按钮53" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:18px;">9</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:266px;top:410px;width:48px;height:40px;position:absolute;">
+			<button id="按钮54" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">=</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:165px;top:5px;width:150px;height:40px;position:absolute;">
+			<button id="按钮55" type="button" class="mui-btn mui-btn-success" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">下一步</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:5px;width:150px;height:40px;position:absolute;">
+			<button id="按钮56" type="button" class="mui-btn mui-btn-danger" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">取消</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:83px;top:55px;width:75px;height:40px;position:absolute;">
+			<button id="按钮57" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">说明</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:161px;top:55px;width:75px;height:40px;position:absolute;">
+			<button id="按钮58" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">退格</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:239px;top:55px;width:75px;height:40px;position:absolute;">
+			<button id="按钮59" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">换行</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:55px;width:75px;height:40px;position:absolute;">
+			<button id="按钮60" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:16px;">Abs</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:455px;width:32px;height:40px;position:absolute;">
+			<button id="按钮61" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">if</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:109px;top:455px;width:32px;height:40px;position:absolute;">
+			<button id="按钮62" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;"><</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:143px;top:455px;width:32px;height:40px;position:absolute;">
+			<button id="按钮63" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">></button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:177px;top:455px;width:32px;height:40px;position:absolute;">
+			<button id="按钮64" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">≠</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:211px;top:455px;width:32px;height:40px;position:absolute;">
+			<button id="按钮65" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">{</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:282px;top:455px;width:32px;height:40px;position:absolute;">
+			<button id="按钮66" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">}</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:39px;top:455px;width:34px;height:40px;position:absolute;">
+			<button id="按钮67" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">and</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:75px;top:455px;width:32px;height:40px;position:absolute;">
+			<button id="按钮68" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">or</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:245px;top:455px;width:35px;height:40px;position:absolute;">
+			<button id="按钮69" type="button" class="mui-btn mui-btn-warning" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">else</button>
+		</div>
+		</div>
+
+	</div>
+
+</body>
+<script src="js/mui.min.js"></script>
+<script src="gongyongmokuai.js"></script>
+<script src="js/bluebird_math.js"></script>
+<script src="js/bluebird_string.js"></script>
+<script src="js/bluebird_localStorage.js"></script>
+<script src="js/bluebird_window.js"></script>
+<script src="js/bluebird_titleBar.js"></script>
+<script src="js/bluebird_tabBar.js"></script>
+<script src="js/bluebird_editBox.js"></script>
+<script src="js/bluebird_freedomPanel.js"></script>
+<script src="js/bluebird_button.js"></script>
+<script src="js/bluebird_dialogBox.js"></script>
+<script src="chuangkou25.js"></script>
+</html>

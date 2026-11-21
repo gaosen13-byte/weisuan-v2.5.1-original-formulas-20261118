@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>引流计算</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/icons-extra.css" rel="stylesheet"/>
+    <link rel="icon" href="favicon.png" type="images/x-ico" />
+    <style type="text/css">
+        body{background-color:#EFEFF4;}
+    </style>
+		<style type="text/css">
+			.mui-preview-image.mui-fullscreen {
+				position: fixed;
+				z-index: 20;
+				background-color: #000;
+			}
+			.mui-preview-header,
+			.mui-preview-footer {
+				position: absolute;
+				width: 100%;
+				left: 0;
+				z-index: 10;
+			}
+			.mui-preview-header {
+				height: 44px;
+				top: 0;
+			}
+			.mui-preview-footer {
+				height: 50px;
+				bottom: 0px;
+			}
+			.mui-preview-header .mui-preview-indicator {
+				display: block;
+				line-height: 25px;
+				color: #fff;
+				text-align: center;
+				margin: 15px auto 4;
+				width: 70px;
+				background-color: rgba(0, 0, 0, 0.4);
+				border-radius: 12px;
+				font-size: 16px;
+			}
+			.mui-preview-image {
+				display: none;
+				-webkit-animation-duration: 0.5s;
+				animation-duration: 0.5s;
+				-webkit-animation-fill-mode: both;
+				animation-fill-mode: both;
+			}
+			.mui-preview-image.mui-preview-in {
+				-webkit-animation-name: fadeIn;
+				animation-name: fadeIn;
+			}
+			.mui-preview-image.mui-preview-out {
+				background: none;
+				-webkit-animation-name: fadeOut;
+				animation-name: fadeOut;
+			}
+			.mui-preview-image.mui-preview-out .mui-preview-header,
+			.mui-preview-image.mui-preview-out .mui-preview-footer {
+				display: none;
+			}
+			.mui-zoom-scroller {
+				position: absolute;
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: flex;
+				-webkit-box-align: center;
+				-webkit-align-items: center;
+				align-items: center;
+				-webkit-box-pack: center;
+				-webkit-justify-content: center;
+				justify-content: center;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				-webkit-backface-visibility: hidden;
+			}
+			.mui-zoom {
+				-webkit-transform-style: preserve-3d;
+				transform-style: preserve-3d;
+			}
+			.mui-slider .mui-slider-group .mui-slider-item img {
+				width: auto;
+				height: auto;
+				max-width: 100%;
+				max-height: 100%;
+			}
+			.mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
+				width: 100%;
+			}
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
+				display: inline-table;
+			}
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
+				display: table-cell;
+				vertical-align: middle;
+			}
+			.mui-preview-loading {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				display: none;
+			}
+			.mui-preview-loading.mui-active {
+				display: block;
+			}
+			.mui-preview-loading .mui-spinner-white {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -25px;
+				margin-top: -25px;
+				height: 50px;
+				width: 50px;
+			}
+			.mui-preview-image img.mui-transitioning {
+				-webkit-transition: -webkit-transform 0.5s ease, opacity 0.5s ease;
+				transition: transform 0.5s ease, opacity 0.5s ease;
+			}
+			@-webkit-keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+			@keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+			@-webkit-keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+			@keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+		</style>
+
+</head>
+<body>
+	<header id="标题栏1" class="mui-bar mui-bar-nav" style="background:#F7F7F7;">
+		<a class="mui-icon mui-icon-left-nav mui-pull-left" style="color:#007AFF;"></a>
+		<h1 class="mui-title" style="color:#0088FF;">引流计算板块</h1>
+		<a class="mui-icon mui-icon-bars mui-pull-right" style="color:#007AFF;"></a>
+	</header>
+
+	<style>
+		.mui-bar-tab{background: #F7F7F7;}
+		.mui-bar-tab .mui-tab-item{color: #8E8E8E;}
+		.mui-bar-tab .mui-tab-item.mui-active{color: #007AFF;}
+	</style>
+	<nav id="导航栏1" class="mui-bar mui-bar-tab">
+	</nav>
+
+	<div class="mui-content" style="background-color:transparent;display:-webkit-flex;flex-direction:column;display:none">
+
+		<div id="自由面板1" class="mui-input-row" tag="自由面板" style="margin:0px 0px 5px 0px;display:-webkit-flex;width:100%;height:220px;">
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:10px;top:45px;width:145px;height:40px;position:absolute;">
+			<button id="按钮1" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">单 分 裂</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:165px;top:45px;width:145px;height:40px;position:absolute;">
+			<button id="按钮2" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">双 分 裂</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:10px;top:90px;width:145px;height:40px;position:absolute;">
+			<button id="按钮3" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">三 分 裂</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:165px;top:90px;width:145px;height:40px;position:absolute;">
+			<button id="按钮4" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">四 分 裂</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:10px;top:135px;width:145px;height:40px;position:absolute;">
+			<button id="按钮5" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">六 分 裂</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:165px;top:135px;width:145px;height:40px;position:absolute;">
+			<button id="按钮6" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">八 分 裂</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:10px;top:0px;width:300px;height:40px;position:absolute;">
+			<button id="按钮7" type="button" class="mui-btn mui-btn-success" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">引 流 辅 助 计 算</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:10px;top:180px;width:145px;height:40px;position:absolute;">
+			<button id="按钮10" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">十分裂</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:165px;top:180px;width:145px;height:40px;position:absolute;">
+			<button id="按钮11" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">敬请期待</button>
+		</div>
+		</div>
+
+		<div id="自由面板2" class="mui-input-row" tag="自由面板" style="margin:0px 0px 5px 0px;display:-webkit-flex;width:100%;height:535px;">
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:10px;top:5px;width:145px;height:40px;position:absolute;">
+			<button id="按钮8" type="button" class="mui-btn mui-btn-success" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">图 片 说 明</button>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:165px;top:5px;width:145px;height:40px;position:absolute;">
+			<button id="按钮9" type="button" class="mui-btn mui-btn-success" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:15px;">视 频 讲 解</button>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block;left:10px;top:55px;width:150px;height:120px;position:absolute;">
+			<img id="图片框1" style="width:100%;height:100%;" src="images/ylt1.jpg" />
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block;left:160px;top:55px;width:150px;height:120px;position:absolute;">
+			<img id="图片框2" style="width:100%;height:100%;" src="images/ylt2.jpg" />
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block;left:10px;top:175px;width:150px;height:120px;position:absolute;">
+			<img id="图片框3" style="width:100%;height:100%;" src="images/ylt3.jpg" />
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block;left:160px;top:175px;width:150px;height:120px;position:absolute;">
+			<img id="图片框4" style="width:100%;height:100%;" src="images/ylt4.jpg" />
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block;left:10px;top:295px;width:150px;height:120px;position:absolute;">
+			<img id="图片框5" style="width:100%;height:100%;" src="images/YLXZJD.png" />
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block;left:160px;top:295px;width:150px;height:120px;position:absolute;">
+			<img id="图片框6" style="width:100%;height:100%;" src="images/YLRS.png" />
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block;left:10px;top:415px;width:150px;height:120px;position:absolute;">
+			<img id="图片框7" style="width:100%;height:100%;" src="images/YLS1.png" />
+		</div>
+
+		<div class="mui-input-row" style="margin:0px 0px -5px 0px;text-align:center;display:block;left:160px;top:415px;width:150px;height:120px;position:absolute;">
+			<img id="图片框8" style="width:100%;height:100%;" src="images/YLS2.png" />
+		</div>
+		</div>
+
+		<div id="按钮组1" class="mui-input-row" style="margin:5px;display:-webkit-flex;text-align:center;">
+			<button id="0" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 0px;font-size:14px;">视频1</button>
+			<button id="1" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">视频2</button>
+			<button id="2" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">视频3</button>
+			<button id="3" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">视频4</button>
+		</div>
+<iframe id="浏览框1" style="width:100%;height:200px" src="" target="_self"></iframe>
+
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签1" style="width:100%;color:#FF0000;font-size:12px;margin:0px 0px 0px 0px;padding:0px;text-align:left"></label>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签2" style="width:100%;color:#0000FF;font-size:16px;margin:0px 0px 0px 0px;padding:0px;text-align:center">如需引流计算,欢迎各位老板微信咨询。<br>杨:15182820246(微电同号)</label>
+		</div>
+
+
+	</div>
+
+</body>
+<script src="js/mui.min.js"></script>
+<script src="gongyongmokuai.js"></script>
+<script src="js/bluebird_math.js"></script>
+<script src="js/bluebird_localStorage.js"></script>
+<script src="js/bluebird_window.js"></script>
+<script src="js/bluebird_titleBar.js"></script>
+<script src="js/bluebird_tabBar.js"></script>
+<script src="js/bluebird_freedomPanel.js"></script>
+<script src="js/bluebird_button.js"></script>
+<script src="js/bluebird_buttonRow.js"></script>
+<script src="js/bluebird_lable.js"></script>
+<script src="js/bluebird_imageBox.js"></script>
+<script src="js/bluebird_dialogBox.js"></script>
+<script src="js/bluebird_webview.js"></script>
+<script src="js/bluebird_imagePreview.js"></script>
+<script src="js/mui.previewimage.js"></script>
+<script src="js/mui.zoom.js"></script>
+<script src="chuangkou33.js"></script>
+</html>

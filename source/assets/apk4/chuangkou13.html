@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>单坡角度正反算</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/icons-extra.css" rel="stylesheet"/>
+    <link rel="icon" href="favicon.png" type="images/x-ico" />
+    <style type="text/css">
+        body{background-color:#EFEFF4;}
+    </style>
+	<style>
+        .mui-radio input[type='radio']:checked:before, .mui-checkbox input[type='checkbox']:checked:before
+        {
+            color: #007AFF;
+        }        
+	</style>
+</head>
+<body>
+	<header id="标题栏1" class="mui-bar mui-bar-nav" style="background:#F7F7F7;">
+		<a class="mui-icon mui-icon-left-nav mui-pull-left" style="color:#007AFF;"></a>
+		<h1 class="mui-title" style="color:#0088FF;"></h1>
+		<a class="mui-icon mui-icon-bars mui-pull-right" style="color:#007AFF;"></a>
+	</header>
+
+	<style>
+		.mui-bar-tab{background: #F7F7F7;}
+		.mui-bar-tab .mui-tab-item{color: #8E8E8E;}
+		.mui-bar-tab .mui-tab-item.mui-active{color: #007AFF;}
+	</style>
+	<nav id="导航栏1" class="mui-bar mui-bar-tab">
+	</nav>
+
+	<div class="mui-content" style="background-color:transparent;display:-webkit-flex;flex-direction:column;display:none">
+<div id="面板1" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+<div id="面板2" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div id="单选框1" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>单坡转公坡角度</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框2" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>公坡角度转单坡</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框3" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>单坡转角度</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框4" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>单坡角度转单坡</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="自由面板1" class="mui-input-row" tag="自由面板" style="margin:0px 0px 5px 0px;display:-webkit-flex;width:100%;height:412px;">
+		<div class="mui-input-row" style="margin:0px;display:block;left:177px;top:122px;width:16px;height:16px;position:absolute;">
+			<label id="标签2" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">°</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:96px;top:110px;width:80px;height:40px;position:absolute;">
+			<input id="编辑框2" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:233px;top:122px;width:18px;height:16px;position:absolute;">
+			<label id="标签3" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">′</label>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:191px;top:110px;width:40px;height:40px;position:absolute;">
+			<input id="编辑框3" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+			<div class="mui-input-row" style="margin:0px;display:block;left:254px;top:110px;width:36px;height:40px;position:absolute;">
+			<input id="编辑框4" type="number" class="mui-input-clear" placeholder="" style="color:#000000;font-size:16px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:291px;top:122px;width:19px;height:16px;position:absolute;">
+			<label id="标签4" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">″</label>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:165px;top:180px;width:150px;height:40px;position:absolute;">
+			<button id="按钮1" type="button" class="mui-btn mui-btn-primary" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">开始计算</button>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:35px;width:320px;height:20px;position:absolute;">
+			<label id="标签9" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">公坡角度结果</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:55px;width:320px;height:20px;position:absolute;">
+			<label id="标签5" style="width:100%;color:#000000;font-size:18px;margin:0px 0px 0px 0px;padding:0px;text-align:center">0</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:0px;top:240px;width:320px;height:100px;position:absolute;">
+			<label id="标签7" style="width:100%;color:#000000;font-size:14px;margin:0px 0px 0px 0px;padding:0px;text-align:left">公坡角度=tan-1(单坡*√2)<br>单坡=tan(角度)÷√2<br><br>单坡角度=tan-1(单坡)<br>单坡=tan(度数)</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:0px;display:block;left:14px;top:122px;width:102px;height:16px;position:absolute;">
+			<label id="标签1" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:left">单坡</label>
+		</div>
+
+		<div class="mui-input-row" style="text-align:center;margin:0px;display:block;left:5px;top:180px;width:150px;height:40px;position:absolute;">
+			<button id="按钮2" type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="width:100%;height:100%;float:none;margin:0px 0px 0px 0px;font-size:14px;">清除数据</button>
+		</div>
+		</div>
+
+	</div>
+
+</body>
+<script src="js/mui.min.js"></script>
+<script src="gongyongmokuai.js"></script>
+<script src="js/bluebird_math.js"></script>
+<script src="js/bluebird_string.js"></script>
+<script src="js/bluebird_localStorage.js"></script>
+<script src="js/bluebird_window.js"></script>
+<script src="js/bluebird_convert.js"></script>
+<script src="js/bluebird_titleBar.js"></script>
+<script src="js/bluebird_tabBar.js"></script>
+<script src="js/bluebird_radio.js"></script>
+<script src="js/bluebird_freedomPanel.js"></script>
+<script src="js/bluebird_lable.js"></script>
+<script src="js/bluebird_editBox.js"></script>
+<script src="js/bluebird_button.js"></script>
+<script src="js/bluebird_dialogBox.js"></script>
+<script src="js/bluebird_panel.js"></script>
+<script src="chuangkou13.js"></script>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>拍照</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/icons-extra.css" rel="stylesheet"/>
+    <link rel="icon" href="favicon.png" type="images/x-ico" />
+    <style type="text/css">
+        body{background-color:#EFEFF4;}
+    </style>
+	<style>
+        .mui-radio input[type='radio']:checked:before, .mui-checkbox input[type='checkbox']:checked:before
+        {
+            color: #007AFF;
+        }        
+	</style>
+</head>
+<body>
+	<header id="标题栏1" class="mui-bar mui-bar-nav" style="background:#F7F7F7;">
+		<a class="mui-icon mui-icon-left-nav mui-pull-left" style="color:#007AFF;"></a>
+		<h1 class="mui-title" style="color:#0088FF;">工程照片拍摄</h1>
+		<a class="mui-icon mui-icon-bars mui-pull-right" style="color:#007AFF;"></a>
+	</header>
+
+	<style>
+		.mui-bar-tab{background: #F7F7F7;}
+		.mui-bar-tab .mui-tab-item{color: #8E8E8E;}
+		.mui-bar-tab .mui-tab-item.mui-active{color: #007AFF;}
+	</style>
+	<nav id="导航栏1" class="mui-bar mui-bar-tab">
+	</nav>
+
+	<div class="mui-content" style="background-color:transparent;display:-webkit-flex;flex-direction:column;display:none">
+
+		<div id="按钮组1" class="mui-input-row" style="margin:5px;display:-webkit-flex;text-align:center;">
+			<button id="0" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 0px;font-size:14px;">按钮0</button>
+			<button id="1" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">按钮1</button>
+		</div>
+<canvas id="画板加强1" width="320px" height="200px" style="width:100%;height:200px"></canvas>
+
+
+		<div id="按钮组2" class="mui-input-row" style="margin:5px;display:-webkit-flex;text-align:center;">
+			<button id="0" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 0px;font-size:14px;">按钮0</button>
+			<button id="1" type="button" class="mui-btn mui-btn-primary" style="-webkit-flex:1;height:40px;margin:0px 0px 0px 5px;font-size:14px;">按钮1</button>
+		</div>
+<div id="面板10" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+<div id="面板11" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签1" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">工程名称</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签2" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">施工部位</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<input id="编辑框2" type="text" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<input id="编辑框3" type="text" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+<div id="面板9" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签6" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">经度</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签7" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">纬度</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<input id="编辑框6" type="number" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<input id="编辑框7" type="number" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+<div id="面板8" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签3" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">施工日期</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签4" style="width:100%;color:#000000;font-size:15px;margin:0px 0px 0px 0px;padding:0px;text-align:center">施工时间</label>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<input id="编辑框4" type="text" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<input id="编辑框5" type="text" placeholder="" style="color:#000000;font-size:14px;margin:0px 0px 0px 0px;"></input>
+		</div>
+<div id="面板3" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div id="单选框5" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>时间自动</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框6" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>时间手动</label>
+			<input name="radio" type="radio">
+		</div>
+<div id="面板2" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div id="单选框3" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>背景透明</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框4" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>背景白底</label>
+			<input name="radio" type="radio">
+		</div>
+<div id="面板5" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div id="单选框9" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>施工部位</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框10" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>活动内容</label>
+			<input name="radio" type="radio">
+		</div>
+<div id="面板6" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div id="单选框11" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>水印关闭</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框12" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>水印开启</label>
+			<input name="radio" type="radio">
+		</div>
+<div id="面板7" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div id="单选框14" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>牌子右边</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框13" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>牌子左边</label>
+			<input name="radio" type="radio">
+		</div>
+<div id="面板1" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div id="单选框1" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>自动坐标</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框16" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>手动坐标</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框2" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>关闭坐标</label>
+			<input name="radio" type="radio">
+		</div>
+<div id="面板4" class="mui-input-row" style="margin:5px;display:-webkit-flex"></div>
+
+
+		<div id="单选框15" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>普通模板</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框8" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>微信模板</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="单选框7" class="mui-input-row mui-radio mui-left" style="margin:0px;display:block;color:#000000">
+			<label>标准模板</label>
+			<input name="radio" type="radio">
+		</div>
+
+		<div id="自由面板2" class="mui-input-row" tag="自由面板" style="margin:0px 0px 5px 0px;display:-webkit-flex;width:100%;height:40px;">
+		<div class="mui-input-row mui-select" style="margin:0px;display:block;left:200px;top:0px;width:120px;height:40px;position:absolute;">
+			<select id="下拉框1" style="width:100%;margin:0px 0px 0px 0px;padding-left:5px;font-size:14px;"></select>
+		</div>
+
+		<div class="mui-input-row mui-select" style="margin:0px;display:block;left:0px;top:0px;width:120px;height:40px;position:absolute;">
+			<select id="下拉框2" style="width:100%;margin:0px 0px 0px 0px;padding-left:5px;font-size:14px;"></select>
+		</div>
+		</div>
+
+		<div class="mui-input-row" style="margin:5px;display:block">
+			<label id="标签9" style="width:100%;color:#000000;font-size:11px;margin:0px 0px 0px 0px;padding:0px;text-align:left">1.拍摄模式为横向拍摄或长宽比为4:3，手动坐标需精确4位数。<br>2.导入标识牌后记得保存照片，照片尺寸可自行选择，照片格式为.jpg<br>3.导入的标识牌如果有误，请重新拍摄或重新在相册导入照片。<br>4.自定义LOGO可在相册里选择图片，LOGO尺寸为425*305</label>
+		</div>
+
+
+
+
+<input type="file" id="文件选择器1" style="display:none;">
+
+
+	</div>
+
+</body>
+<script src="js/mui.min.js"></script>
+<script src="gongyongmokuai.js"></script>
+<script src="js/bluebird_math.js"></script>
+<script src="js/bluebird_string.js"></script>
+<script src="js/bluebird_localStorage.js"></script>
+<script src="js/bluebird_window.js"></script>
+<script src="js/bluebird_convert.js"></script>
+<script src="js/bluebird_titleBar.js"></script>
+<script src="js/bluebird_tabBar.js"></script>
+<script src="js/bluebird_buttonRow.js"></script>
+<script src="js/bluebird_lable.js"></script>
+<script src="js/bluebird_editBox.js"></script>
+<script src="js/bluebird_radio.js"></script>
+<script src="js/bluebird_freedomPanel.js"></script>
+<script src="js/bluebird_dialogBox.js"></script>
+<script src="js/bluebird_xialakuang.js"></script>
+<script src="js/bluebird_canvas.js"></script>
+<script src="js/bluebird_panel.js"></script>
+<script src="js/gps.js"></script>
+<script src="js/bluebird_camera.js"></script>
+<script src="js/bluebird_gallery.js"></script>
+<script src="js/bluebird_fileselect.js"></script>
+<script src="js/bluebird_files_operation.js"></script>
+<script src="chuangkou20.js"></script>
+</html>

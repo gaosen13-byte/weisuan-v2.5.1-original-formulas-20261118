@@ -1,6 +1,6 @@
 # 微算工程 v2.5.1 原版公式对齐包
 
-本私有仓库保存 2026-11-18 交付的 APK 及验证状态。
+本公开仓库保存 2026-11-18 交付的 APK、工程页面代码和验证状态。
 
 下载文件：[`weisuan-v2.5.1-original-formulas.apk`](weisuan-v2.5.1-original-formulas.apk)
 
@@ -33,4 +33,29 @@
 此包使用工具随附的 pyapksigner 证书，与之前维护版签名不同。它不应被视为专有的生产签名。
 覆盖安装可能因签名不一致而失败。卸载旧版会清除应用本地数据，应先备份历史记录和自定义内容。
 
-本仓库仅归档交付文件，不包含签名私钥、账号凭据或 Android SDK。
+## 工程页面代码与构建工具
+
+- [`source/assets/apk4/`](source/assets/apk4/)：直接从本仓库交付 APK 提取的工程 HTML、JavaScript、CSS、图片和依赖文件。包含 37 对工程页面 HTML/JS，以及自定义公式和弛度工具。
+- [`tools/rebuild_apk.py`](tools/rebuild_apk.py)：以仓库 APK 为容器，将修改后的工程资源打包为未签名 APK。
+- [`tools/patch_calculation_gate.py`](tools/patch_calculation_gate.py)、[`tools/verify_patch.py`](tools/verify_patch.py)：原交接包提供的 DEX 定点补丁和校验工具。
+- [`tools/history/`](tools/history/)：本次还原、门控修改、合并和打包使用的历史脚本，保留工作目录路径供审阅；它们依赖当时本地中间文件，不是独立构建入口。
+
+这里提供的是可修改的工程页面代码和维护脚本。原 APK 没有提供 Android Java/Kotlin 项目源码，仓库不包含完整 Android Studio/Gradle 工程。部分未修改的原版 JS 仍为原来的混淆格式，已还原并修改的脚本以可读代码保存。
+
+从仓库根目录执行（需要 Python 3）：
+
+```sh
+python tools/rebuild_apk.py --output build/weisuan-unsigned.apk
+```
+
+使用 Android SDK Build Tools 对齐和自行签名：
+
+```sh
+zipalign -f -p 4 build/weisuan-unsigned.apk build/weisuan-aligned.apk
+apksigner sign --ks /path/to/your-keystore.jks --out build/weisuan-signed.apk build/weisuan-aligned.apk
+apksigner verify --verbose build/weisuan-signed.apk
+```
+
+自行签名的安装包签名和 SHA-256 会变化。重建保留容器 APK 中已打补丁的 DEX；不得对其重复执行原 DEX 补丁脚本。
+
+本仓库不包含签名私钥、账号凭据或 Android SDK。
